@@ -1,0 +1,20 @@
+
+# Define input directory and sample names from config file
+configfile: "config.yaml"
+
+input_dir = config["input_dir"]
+samples = glob_wildcards(input_dir+"/{sample}.fastq.gz").sample
+# Define the final output rule
+rule all:
+    input:
+        expand("fastqc/{sample}.fastqc.html", sample=samples),
+        expand("fastqc/{sample}.fastqc.zip", sample=samples)
+
+# Rule to run FastQC on all samples
+rule fastqc:
+    input: 
+        fastq=input_dir+"/{sample}.fastq.gz"
+    output:
+        html = "fastqc/{sample}.fastqc.html",
+        zip = "fastqc/{sample}.fastqc.zip"
+    shell: "fastqc {input.fastq} --noextract --outdir fastqc/"
