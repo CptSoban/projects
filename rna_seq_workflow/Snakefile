@@ -2,19 +2,65 @@
 # Define input directory and sample names from config file
 configfile: "config.yaml"
 
-input_dir = config["input_dir"]
-samples = glob_wildcards(input_dir+"/{sample}.fastq.gz").sample
+seq_dir = config["seq_dir"]
+samples = glob_wildcards(seq_dir+"/{sample}.fastq.gz").sample
+fw_reads = glob_wildcards(seq_dir+"/{r1}_R1.fastq.gz").r1
+rv_reads = glob_wildcards(seq_dir+"/{r2}_R2.fastq.gz").r2
+
+if config["aligner"] == "STAR":
+    ruleorder: star_align > hisat2_align
+elif config["aligner"] == "HISAT2":
+    ruleorder: hisat2_align > star_align
+
 # Define the final output rule
 rule all:
     input:
         expand("fastqc/{sample}.fastqc.html", sample=samples),
-        expand("fastqc/{sample}.fastqc.zip", sample=samples)
+        expand("fastqc/{sample}.fastqc.zip", sample=samples),
+        expand("cutadapt/trim_{r1}_R1.fastq.gz", r1=fw_reads),
+        expand("cutadapt/trim_{r2}_R2.fastq.gz", r2=rv_reads)
 
 # Rule to run FastQC on all samples
 rule fastqc:
     input: 
-        fastq=input_dir+"/{sample}.fastq.gz"
+        seq = seq_dir+"/{sample}.fastq.gz"
     output:
         html = "fastqc/{sample}.fastqc.html",
         zip = "fastqc/{sample}.fastqc.zip"
-    shell: "fastqc {input.fastq} --noextract --outdir fastqc/"
+    
+    shell: "fastqc {input.seq} --outdir fastqc/"    
+
+#Rule to run cutadapat on all paired-end reads
+rule cutadapt_r1:
+    input:
+        seq_r1 = seq_dir+"/{r1}_R1.fastq.gz"
+    params:
+        adapter_r1 = config["adapter_r1"],
+        quality_cutoff = config["quality_cutoff"]
+    output:
+        trimmed_r1 = "cutadapt/trim_{r1}_R1.fastq.gz",
+    
+    shell:  """cutadapt -q {params.quality_cutoff} -a {params.adapter_r1} -o {output.trimmed_r1} {input.seq_r1}"""
+
+rule cutadapt_r2:
+    input:
+        seq = seq_dir+"/{r2}_R2.fastq.gz"
+    params:
+        adapter = config["adapter_r2"],
+        quality_cutoff = config["quality_cutoff"]
+    output:
+        trimmed = "cutadapt/trim_{r2}_R2.fastq.gz",
+    
+    shell:  """cutadapt -q {params.quality_cutoff} -a {params.adapter} -o {output.trimmed} {input.seq}"""
+
+rule star_align:
+    input:
+    output:
+    params:
+    shell:
+
+rule hisat2_align:
+    input:
+    output:
+    params:
+    shell:

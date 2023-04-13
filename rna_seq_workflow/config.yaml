@@ -1,1 +1,12 @@
-input_dir: /home/marc/snakemake_rnaseq/data/sequences
+seq_dir: "/home/marc/data/rna_seq_test/sequences"
+ref_dir: "/home/marc/data/rna_seq_test/genomes"
+gtf_dir: "/home/marc/data/rna_seq_test/gtfs"
+
+adapter_r1: "ACTG"
+adapter_r2: "ACTG"
+
+#Choose between STAR (computational intensive!) or HISAT2
+aligner: "HISAT2"
+
+#Optional: Choose a quality cutoff value for your reads
+quality_cutoff: ""
