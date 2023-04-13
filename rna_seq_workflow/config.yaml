@@ -1,6 +1,7 @@
 seq_dir: "/home/marc/data/rna_seq_test/sequences"
 ref_dir: "/home/marc/data/rna_seq_test/genomes"
 gtf_dir: "/home/marc/data/rna_seq_test/gtfs"
+results_dir: "home/marc/results"
 
 adapter_r1: "ACTG"
 adapter_r2: "ACTG"

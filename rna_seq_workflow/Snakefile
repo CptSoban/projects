@@ -3,30 +3,34 @@
 configfile: "config.yaml"
 
 seq_dir = config["seq_dir"]
+ref_dir = config["ref_dir"]
+results_dir = config["results_dir"]
+ref_genomes = glob_wildcards(ref_dir+"/{ref_id}.fna").ref_id
 samples = glob_wildcards(seq_dir+"/{sample}.fastq.gz").sample
 fw_reads = glob_wildcards(seq_dir+"/{r1}_R1.fastq.gz").r1
 rv_reads = glob_wildcards(seq_dir+"/{r2}_R2.fastq.gz").r2
 
-if config["aligner"] == "STAR":
-    ruleorder: star_align > hisat2_align
-elif config["aligner"] == "HISAT2":
-    ruleorder: hisat2_align > star_align
+#if config["aligner"] == "STAR":
+ #   ruleorder: star_align > hisat2_align
+#elif config["aligner"] == "HISAT2":
+ #   ruleorder: hisat2_align > star_align
 
 # Define the final output rule
 rule all:
     input:
-        expand("fastqc/{sample}.fastqc.html", sample=samples),
-        expand("fastqc/{sample}.fastqc.zip", sample=samples),
-        expand("cutadapt/trim_{r1}_R1.fastq.gz", r1=fw_reads),
-        expand("cutadapt/trim_{r2}_R2.fastq.gz", r2=rv_reads)
+        expand(results_dir+"/fastqc/{sample}.fastqc.html", sample=samples),
+        expand(results_dir+"/fastqc/{sample}.fastqc.zip", sample=samples),
+        expand(results_dir+"/cutadapt/trim_{r1}_R1.fastq.gz", r1=fw_reads),
+        expand(results_dir+"/cutadapt/trim_{r2}_R2.fastq.gz", r2=rv_reads),
+        expand(ref_dir+"/ht2_index/{ref_id}", ref_id= ref_genomes)
 
 # Rule to run FastQC on all samples
 rule fastqc:
     input: 
         seq = seq_dir+"/{sample}.fastq.gz"
     output:
-        html = "fastqc/{sample}.fastqc.html",
-        zip = "fastqc/{sample}.fastqc.zip"
+        html = results_dir+"/fastqc/{sample}.fastqc.html",
+        zip = results_dir+"/fastqc/{sample}.fastqc.zip"
     
     shell: "fastqc {input.seq} --outdir fastqc/"    
 
@@ -38,7 +42,7 @@ rule cutadapt_r1:
         adapter_r1 = config["adapter_r1"],
         quality_cutoff = config["quality_cutoff"]
     output:
-        trimmed_r1 = "cutadapt/trim_{r1}_R1.fastq.gz",
+        trimmed_r1 = results_dir+"/cutadapt/trim_{r1}_R1.fastq.gz",
     
     shell:  """cutadapt -q {params.quality_cutoff} -a {params.adapter_r1} -o {output.trimmed_r1} {input.seq_r1}"""
 
@@ -49,18 +53,14 @@ rule cutadapt_r2:
         adapter = config["adapter_r2"],
         quality_cutoff = config["quality_cutoff"]
     output:
-        trimmed = "cutadapt/trim_{r2}_R2.fastq.gz",
+        trimmed = results_dir+"/cutadapt/trim_{r2}_R2.fastq.gz",
     
     shell:  """cutadapt -q {params.quality_cutoff} -a {params.adapter} -o {output.trimmed} {input.seq}"""
 
-rule star_align:
+rule hisat2_index:
     input:
+        ref_genome = ref_dir+"/{ref_id}.fna"
     output:
-    params:
-    shell:
+        index_file = ref_dir+"/ht2_index/{ref_id}"
 
-rule hisat2_align:
-    input:
-    output:
-    params:
-    shell:
+    shell: """hisat2-build {input.ref_genome} {output.index_file}"""
