@@ -1,13 +1,15 @@
 seq_dir: "/home/marc/data/rna_seq_test/sequences"
-ref_dir: "/home/marc/data/rna_seq_test/genomes"
+ref_file: "/home/marc/data/rna_seq_test/genomes/Fusarium_oxysporum_f_sp_cubense_gca_007994515.ASM799451v1.dna.toplevel.fa"
+organism: "Fusarium_oxysporum"
 gtf_dir: "/home/marc/data/rna_seq_test/gtfs"
-results_dir: "home/marc/results"
+results_dir: "/home/marc/results"
 
 adapter_r1: "ACTG"
 adapter_r2: "ACTG"
+threads:  2
 
-#Choose between STAR (computational intensive!) or HISAT2
-aligner: "HISAT2"
+#Choose between STAR (computational intensive! Use HPC) or HISAT2
+Alignment_tool: "HISAT2"
 
 #Optional: Choose a quality cutoff value for your reads
 quality_cutoff: ""
