@@ -1,11 +1,12 @@
-seq_dir: "/home/marc/data/rna_seq_test/sequences"
-ref_file: "/home/marc/data/rna_seq_test/genomes/Fusarium_oxysporum_f_sp_cubense_gca_007994515.ASM799451v1.dna.toplevel.fa"
-organism: "Fusarium_oxysporum"
-gtf_dir: "/home/marc/data/rna_seq_test/gtfs"
-results_dir: "/home/marc/results"
+seq_dir: "/home/marc/data/rna_seq_test/test2/reads"
+ref_genome: "/home/marc/data/rna_seq_test/test2/reference_genome/GCF_000001735.4_TAIR10.1_genomic.fna"
+Run ID: "Arabidopsis_thaliana"
+gtf: "/home/marc/data/rna_seq_test/test2/gtf/GCF_000001735.4_TAIR10.1_genomic.gff"
+results_dir: "/home/marc/results/test2"
 
-adapter_r1: "ACTG"
-adapter_r2: "ACTG"
+Trimming: "n"
+adapter_r1: "A"
+adapter_r2: "A"
 threads:  2
 
 #Choose between STAR (computational intensive! Use HPC) or HISAT2

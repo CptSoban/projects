@@ -1,13 +1,23 @@
+# Wishlist:
+# - Single-end reads support
+# - Download reference genome
+# - qc after trimming
+# - make trimming optional
+# - flexible input (_1.fq instead of established _R1.fastq.gz for example)
+
 
 # Define input directory and sample names from config file
 configfile: "config.yaml"
 
 seq_dir = config["seq_dir"]
 results_dir = config["results_dir"]
-ref_genome = config["ref_file"]
-organism = config["organism"]
-samples = glob_wildcards(seq_dir+"/{sample}_{pos}.fastq.gz")
+samples = glob_wildcards(seq_dir+"/{sample}_{pos}.fastq")
+ref_genome = config["ref_genome"]
+run_id = config["Run ID"]
+gtf = config["gtf"]
+trimming = config["Trimming"]
 Alignment_tool = config["Alignment_tool"]
+
 
 
 # Define the final output rule
@@ -15,80 +25,76 @@ rule all:
     input:
         expand(results_dir+"/fastqc/{sample}_{pos}_fastqc.html", sample=samples.sample, pos=samples.pos),
         expand(results_dir+"/fastqc/{sample}_{pos}_fastqc.zip", sample=samples.sample, pos=samples.pos),
-        expand(results_dir+"/cutadapt/trim_{sample}_{pos}.fastq.gz", sample=samples.sample, pos=samples.pos),
-        expand(results_dir+"/{aligner}/index/", aligner=Alignment_tool),
-        expand(results_dir+"/{aligner}/alignment/{sample}.bam", aligner=Alignment_tool, sample=samples.sample),
-        expand(results_dir+"/{aligner}/alignment/{sample}.sortedByCoord.out.bam", aligner=Alignment_tool, sample=samples.sample),
+        expand(results_dir+"/{aligner}/index/"+run_id, aligner=Alignment_tool),
+        expand(results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam", sample=samples.sample, aligner=Alignment_tool),
+        expand(results_dir+"/feature_counts/{aligner}/{sample}.txt", aligner= Alignment_tool, sample=samples.sample)
 
 
 # Rule to run FastQC on all samples
 rule fastqc:
     input: 
-        seq = seq_dir+"/{sample}_{pos}.fastq.gz",
+        seq = seq_dir+"/{sample}_{pos}.fastq"
     output:
         html = results_dir+"/fastqc/{sample}_{pos}_fastqc.html",
-        zip_file = results_dir+"/fastqc/{sample}_{pos}_fastqc.zip",   
+        zip_file = results_dir+"/fastqc/{sample}_{pos}_fastqc.zip"   
     params:
-        results_dir = results_dir+"/fastqc",
+        results_dir = results_dir+"/fastqc"
     threads:
-        config["threads"],
-    shell:"""
-        fastqc -t {threads} {input.seq} --outdir {params}
-    """
+        config["threads"]
+    shell:"""fastqc -t {threads} {input.seq} --outdir {params}"""
 
 #Rule to run cutadapat on all paired-end reads
 rule cutadapt:
     input:
-        seq_r1 = seq_dir+"/{sample}_R1.fastq.gz",
-        seq_r2 = seq_dir+"/{sample}_R2.fastq.gz",
+        seq_r1 = seq_dir+"/{sample}_R1.fastq" if trimming == "y" else "",
+        seq_r2 = seq_dir+"/{sample}_R2.fastq" if trimming == "y" else ""
     output:
-        trimmed_r1 = results_dir+"/cutadapt/trim_{sample}_R1.fastq.gz",
-        trimmed_r2 = results_dir+"/cutadapt/trim_{sample}_R2.fastq.gz",
+        trimmed_r1 = results_dir+"/cutadapt/trim_{sample}_R1.fastq",
+        trimmed_r2 = results_dir+"/cutadapt/trim_{sample}_R2.fastq"
     params:
         adapter_r1 = config["adapter_r1"],
         adapter_r2 = config["adapter_r2"],
-        quality_cutoff = "-q "+config["quality_cutoff"] if config["quality_cutoff"] else "",
+        quality_cutoff = "-q "+config["quality_cutoff"] if config["quality_cutoff"] else ""
     threads:
-        config["threads"],
+        config["threads"]
 
     shell:  """cutadapt -j 2 {params.quality_cutoff} -a {params.adapter_r1} -A {params.adapter_r2} -o {output.trimmed_r1} -p {output.trimmed_r2} {input.seq_r1} {input.seq_r2}"""
 
 if Alignment_tool == "HISAT2":
     rule hisat2_index:
         input:
-            ref_genome,
+            ref_genome
         output:
-            index_file = directory(results_dir+"/{aligner}/index/"),
+            index_file = directory(results_dir+"/HISAT2/index/"+run_id)
         params:
-            organism
+            output_basename = results_dir+"/HISAT2/index/"+run_id+"/"+run_id
         threads:
-            config["threads"],
+            config["threads"]
 
-        shell: """mkdir {output.index_file} && hisat2-build -p {threads} {input} {output.index_file}{params}"""       
+        shell: """mkdir {output.index_file} && hisat2-build -p {threads} {input} {params.output_basename}"""       
 
     rule hisat2_align:
         input:
-            trimmed_r1 = results_dir+"/cutadapt/trim_{sample}_R1.fastq.gz",
-            trimmed_r2 = results_dir+"/cutadapt/trim_{sample}_R2.fastq.gz",
+            r1 = results_dir+"/cutadapt/trim_{sample}_R1.fastq" if trimming == "y" else seq_dir+"/{sample}_R1.fastq",
+            r2 = results_dir+"/cutadapt/trim_{sample}_R2.fastq" if trimming == "y" else seq_dir+"/{sample}_R2.fastq"
         output:
-            bam_file = results_dir+"/{aligner}/alignment/{sample}.bam",
+            bam_file = results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam"
         log:
-            summary = results_dir+"/{aligner}/alignment/logs/{sample}_summary.log",
-            metrics = results_dir+"/{aligner}/alignment/logs/{sample}_metrics.log",
+            summary = results_dir+"/{aligner}/alignment/{sample}/{sample}_summary.log",
+            metrics = results_dir+"/{aligner}/alignment/{sample}/{sample}_metrics.log"
         params:
-            indexed_genome_prefix = results_dir+"/{aligner}/index/"+organism,
+            indexed_genome_prefix = results_dir+"/{aligner}/index/"+run_id+"/"+run_id
         threads:
-            config["threads"],
+            config["threads"]
 
-        shell: """hisat2 -p {threads} -x {params.indexed_genome_prefix} -1 {input.trimmed_r1} -2 {input.trimmed_r2} --summary-file {log.summary} --met-file {log.metrics} | samtools view -Sbh -o {output.bam_file}"""
-
+        shell: """hisat2 -p {threads} -x {params.indexed_genome_prefix} -1 {input.r1} -2 {input.r2} --summary-file {log.summary} --met-file {log.metrics} | samtools sort -o {output.bam_file}"""
 
 elif Alignment_tool == "STAR":
     rule star_index:
         input:
             ref_genome
         output:
-            directory(results_dir+"/{aligner}/index/"+organism)
+            directory(results_dir+"/STAR/index/"+run_id)
         threads:
             config["threads"]
 
@@ -96,14 +102,32 @@ elif Alignment_tool == "STAR":
     
     rule star_align:
         input:
-            trimmed_r1 = results_dir+"/cutadapt/trim_{sample}_R1.fastq.gz",
-            trimmed_r2 = results_dir+"/cutadapt/trim_{sample}_R2.fastq.gz",
-            indexed_genome = results_dir+"/{aligner}/index/",
+            r1 = results_dir+"/cutadapt/trim_{sample}_R1.fastq" if trimming == "y" else seq_dir+"/{sample}_R1.fastq",
+            r2 = results_dir+"/cutadapt/trim_{sample}_R2.fastq" if trimming == "y" else seq_dir+"/{sample}_R2.fastq",
+            indexed_genome_dir = results_dir+"/{aligner}/index/"+run_id
         output:
-            bam_file = results_dir+"/{aligner}/alignment/{sample}.sortedByCoord.out.bam",
+            bam_file = results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam"
         params:
-            output_prefix = results_dir+"/{aligner}/alignment/{sample}",
+            output_prefix = results_dir+"/{aligner}/alignment/{sample}/{sample}"
 
-        threads: config{"threads"}
+        threads: config["threads"]
 
-        shell: """STAR runMode alignReads --runThreadN {threads} --genomeDir {input.indexed_genome} --readFilesIn {input.trimmed_r1}, {input.trimmed_r2} --readFilesCommand zcat --outFileNamePrefix {params.output_prefix} --outSAMtype BAM SortedByCoordinate"""
+        shell: """STAR runMode alignReads --runThreadN {threads} --genomeDir {input.indexed_genome} --readFilesIn {input.r1}, {input.r2} --readFilesCommand zcat --outFileNamePrefix {params.output_prefix} --outSAMtype BAM SortedByCoordinate"""
+
+rule featureCounts:
+    input:
+        gtf,
+        bam_file = results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam"
+    output:
+        counts = results_dir+"/feature_counts/{aligner}/{sample}.txt"
+
+    threads: config["threads"]
+
+    shell: """featureCounts -T {threads} -a {input.gtf} -o {output.counts} {input.bam_file}"""
+
+# rule deseq2:
+#     input:
+#         counts = results_dir+"/feature_counts/{sample}"
+#     output:
+        
+#     shell: """./deseq2_analysis.R"
