@@ -14,7 +14,6 @@ results_dir = config["results_dir"]
 samples = glob_wildcards(seq_dir+"/{sample}_{pos}.fastq")
 ref_genome = config["ref_genome"]
 run_id = config["Run ID"]
-gtf = config["gtf"]
 trimming = config["Trimming"]
 Alignment_tool = config["Alignment_tool"]
 
@@ -23,11 +22,8 @@ Alignment_tool = config["Alignment_tool"]
 # Define the final output rule
 rule all:
     input:
-        expand(results_dir+"/fastqc/{sample}_{pos}_fastqc.html", sample=samples.sample, pos=samples.pos),
-        expand(results_dir+"/fastqc/{sample}_{pos}_fastqc.zip", sample=samples.sample, pos=samples.pos),
-        expand(results_dir+"/{aligner}/index/"+run_id, aligner=Alignment_tool),
         expand(results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam", sample=samples.sample, aligner=Alignment_tool),
-        expand(results_dir+"/feature_counts/{aligner}/{sample}.txt", aligner= Alignment_tool, sample=samples.sample)
+        expand(results_dir+"/feature_counts/{aligner}/"+run_id+".txt", aligner= Alignment_tool, sample=set(samples.sample))
 
 
 # Rule to run FastQC on all samples
@@ -43,7 +39,7 @@ rule fastqc:
         config["threads"]
     shell:"""fastqc -t {threads} {input.seq} --outdir {params}"""
 
-#Rule to run cutadapat on all paired-end reads
+#Rule to run cutadapt on all paired-end reads
 rule cutadapt:
     input:
         seq_r1 = seq_dir+"/{sample}_R1.fastq" if trimming == "y" else "",
@@ -65,13 +61,14 @@ if Alignment_tool == "HISAT2":
         input:
             ref_genome
         output:
-            index_file = directory(results_dir+"/HISAT2/index/"+run_id)
+            index_file = results_dir+"/HISAT2/index/"+run_id+"/"+run_id+".1.ht2"
         params:
-            output_basename = results_dir+"/HISAT2/index/"+run_id+"/"+run_id
+            index_dir = directory(results_dir+"/HISAT2/index/"+run_id),
+            basename = results_dir+"/HISAT2/index/"+run_id+"/"+run_id
         threads:
             config["threads"]
 
-        shell: """mkdir {output.index_file} && hisat2-build -p {threads} {input} {params.output_basename}"""       
+        shell: """mkdir {params.index_dir} && hisat2-build -p {threads} {input} {params.basename}"""       
 
     rule hisat2_align:
         input:
@@ -116,14 +113,14 @@ elif Alignment_tool == "STAR":
 
 rule featureCounts:
     input:
-        gtf,
-        bam_file = results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam"
+        gtf = config["gtf"],
+        bam_files = expand(results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam", aligner=Alignment_tool, sample=set(samples.sample))
     output:
-        counts = results_dir+"/feature_counts/{aligner}/{sample}.txt"
+        counts = results_dir+"/feature_counts/{aligner}/"+run_id+".txt"
 
     threads: config["threads"]
 
-    shell: """featureCounts -T {threads} -a {input.gtf} -o {output.counts} {input.bam_file}"""
+    shell: """featureCounts -T {threads} -p -a {input.gtf} -o {output.counts} {input.bam_files}"""
 
 # rule deseq2:
 #     input:
