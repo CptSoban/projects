@@ -3,8 +3,10 @@
 # - Download reference genome
 # - qc after trimming
 # - make trimming optional
-# - flexible input (_1.fq instead of established _R1.fastq.gz for example)
+# - option for gz and raw input.fastq
 
+import pandas as pd 
+import numpy as np
 
 # Define input directory and sample names from config file
 configfile: "config.yaml"
@@ -75,10 +77,10 @@ if Alignment_tool == "HISAT2":
             r1 = results_dir+"/cutadapt/trim_{sample}_R1.fastq" if trimming == "y" else seq_dir+"/{sample}_R1.fastq",
             r2 = results_dir+"/cutadapt/trim_{sample}_R2.fastq" if trimming == "y" else seq_dir+"/{sample}_R2.fastq"
         output:
-            bam_file = results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam"
+            bam_file = results_dir+"/{aligner}/alignment/"+run_id+"/{sample}.sortedByCoord.out.bam"
         log:
-            summary = results_dir+"/{aligner}/alignment/{sample}/{sample}_summary.log",
-            metrics = results_dir+"/{aligner}/alignment/{sample}/{sample}_metrics.log"
+            summary = results_dir+"/{aligner}/alignment/"+run_id+"/{sample}_summary.log",
+            metrics = results_dir+"/{aligner}/alignment/"+run_id+"/{sample}_metrics.log"
         params:
             indexed_genome_prefix = results_dir+"/{aligner}/index/"+run_id+"/"+run_id
         threads:
@@ -103,7 +105,7 @@ elif Alignment_tool == "STAR":
             r2 = results_dir+"/cutadapt/trim_{sample}_R2.fastq" if trimming == "y" else seq_dir+"/{sample}_R2.fastq",
             indexed_genome_dir = results_dir+"/{aligner}/index/"+run_id
         output:
-            bam_file = results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam"
+            bam_file = results_dir+"/{aligner}/alignment/"+run_id+"/{sample}.sortedByCoord.out.bam"
         params:
             output_prefix = results_dir+"/{aligner}/alignment/{sample}/{sample}"
 
@@ -114,17 +116,33 @@ elif Alignment_tool == "STAR":
 rule featureCounts:
     input:
         gtf = config["gtf"],
-        bam_files = expand(results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam", aligner=Alignment_tool, sample=set(samples.sample))
+        bam_files = expand(results_dir+"/{aligner}/alignment/"+run_id+"/{sample}.sortedByCoord.out.bam", aligner=Alignment_tool, sample=set(samples.sample))
     output:
-        counts = results_dir+"/feature_counts/{aligner}/"+run_id+".txt"
+        counts = results_dir+"/feature_counts/"+run_id+"/+run_id+".txt"
 
     threads: config["threads"]
 
-    shell: """featureCounts -T {threads} -p -a {input.gtf} -o {output.counts} {input.bam_files}"""
+    shell: """featureCounts -T {threads} -p -a {input.gtf} -o {output.counts} {input.bam_files} | tail +2 {output.counts} > {output.counts}"""
 
-# rule deseq2:
-#     input:
-#         counts = results_dir+"/feature_counts/{sample}"
-#     output:
+rule deseq2:
+    input:
+        counts = f"{results_dir}/feature_counts/{run_id}/{run_id}.txt"
+        sample_info = 
+    output:
         
-#     shell: """./deseq2_analysis.R"
+     run:
+        counts_df = pd.read_csv(input.counts, sep= "\t", header=0)
+        #Moves Geneid column to index
+        #counts_df = pd.read_csv(input.counts, sep= "\t", header=0, index_col=0)
+        counts_df = counts_df.drop(["Chr","Start","End","Strand","Length"])
+
+        for col_name in counts_df.columns:
+            new_col_name = Path(col_name).stem.removesuffix(".sortedByCoord.out")
+            counts_df.rename(columns={col_name: new_col_name}, inplace=True)
+
+        sample_info_df = pd.read_csv(input.sample_info, sep="\t" header=0)
+        sorted_sample_list = sample_info_df["sample"].tolist()
+        #Not necessary if the above is true
+        sorted_sample_list.insert(0,"Geneid")
+
+        counts_df = counts_df[sorted_sample_list]
