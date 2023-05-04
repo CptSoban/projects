@@ -24,8 +24,9 @@ Alignment_tool = config["Alignment_tool"]
 # Define the final output rule
 rule all:
     input:
-        expand(results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam", sample=samples.sample, aligner=Alignment_tool),
-        expand(results_dir+"/feature_counts/{aligner}/"+run_id+".txt", aligner= Alignment_tool, sample=set(samples.sample))
+        expand(results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam", sample=set(samples.sample), aligner=Alignment_tool),
+        f"{results_dir}/feature_counts/{run_id}/{run_id}_counts.txt",
+       # f"{results_dir}/feature_counts/{run_id}/mod_{run_id}_counts.csv"
 
 
 # Rule to run FastQC on all samples
@@ -118,31 +119,48 @@ rule featureCounts:
         gtf = config["gtf"],
         bam_files = expand(results_dir+"/{aligner}/alignment/"+run_id+"/{sample}.sortedByCoord.out.bam", aligner=Alignment_tool, sample=set(samples.sample))
     output:
-        counts = results_dir+"/feature_counts/"+run_id+"/+run_id+".txt"
+        counts_table = f"{results_dir}/feature_counts/{run_id}/{run_id}_counts.txt"
 
     threads: config["threads"]
 
-    shell: """featureCounts -T {threads} -p -a {input.gtf} -o {output.counts} {input.bam_files} | tail +2 {output.counts} > {output.counts}"""
+    shell: """featureCounts -T {threads} -p -a {input.gtf} -o {output.counts_table} {input.bam_files} | tail +2 {output.counts_table} > {output.counts_table}"""
 
-rule deseq2:
+rule deseq2_prep:
     input:
-        counts = f"{results_dir}/feature_counts/{run_id}/{run_id}.txt"
-        sample_info = 
+        counts_table = f"{results_dir}/feature_counts/{run_id}/{run_id}_counts.txt",
+        sample_info = f"{seq_dir}/{run_id}_info.txt"
     output:
-        
-     run:
-        counts_df = pd.read_csv(input.counts, sep= "\t", header=0)
-        #Moves Geneid column to index
-        #counts_df = pd.read_csv(input.counts, sep= "\t", header=0, index_col=0)
-        counts_df = counts_df.drop(["Chr","Start","End","Strand","Length"])
+        prep_counts_table = f"{results_dir}/feature_counts/{run_id}/mod_{run_id}_counts.csv"
+    log:
+        filtered = f"{results_dir}/feature_counts/{run_id}/abundance_filter.log"
+    run:
+        #Read in counts table
+        counts_df = pd.read_csv(input.counts_table, sep= "\t", header=0,)
+        #Drop unnecessary columns that would stop DESeq2 from correctly identifying the count table
+        counts_df = counts_df.drop(["Chr","Start","End","Strand","Length"], axis=1)
 
+        unfiltered_counts = len(counts_df.index)
+
+        #Replace "realpath" for sample id as column name
         for col_name in counts_df.columns:
             new_col_name = Path(col_name).stem.removesuffix(".sortedByCoord.out")
             counts_df.rename(columns={col_name: new_col_name}, inplace=True)
 
-        sample_info_df = pd.read_csv(input.sample_info, sep="\t" header=0)
+        #Read in sample information (e.g. "treated" or "control")
+        sample_info_df = pd.read_csv(input.sample_info, sep="\t", header=0)
+        #Put sample ids from sample information in a list
         sorted_sample_list = sample_info_df["sample"].tolist()
-        #Not necessary if the above is true
-        sorted_sample_list.insert(0,"Geneid")
+        sorted_sample_list.insert(0, "Geneid")
 
+        #Orders the columns based on the order of sample ids in the sample information (Requiered by DESeq2)
         counts_df = counts_df[sorted_sample_list]
+
+        counts_df = counts_df[counts_df.iloc[:, 1:].sum(axis=1) >= 10]
+        filtered_counts = len(counts_df.index)
+        with open(log.filtered, "w") as log_file:
+            log_file.write(f"From {unfiltered_counts} genes, {filtered_counts} occured at least 10 times across samples and where used for subsequent analysis")
+
+        counts_df.to_csv(output.prep_counts_table, index=False)
+
+#rule deseq2:
+
