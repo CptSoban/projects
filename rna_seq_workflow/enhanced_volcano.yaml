@@ -1,0 +1,7 @@
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - r-base=4.2.0
+ - r-tidyverse=2.0.0
+ - bioconductor-enhancedvolcano=1.16.0
