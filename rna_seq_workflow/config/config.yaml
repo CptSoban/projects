@@ -1,9 +1,9 @@
 seq_dir: "/home/marc/data/rna_seq_test/test2/reads"
 ref_genome: "/home/marc/data/rna_seq_test/test2/reference_genome/GCF_000001735.4_TAIR10.1_genomic.fna"
 Run ID: "Arabidopsis_thaliana"
-gtf: "/home/marc/data/rna_seq_test/test2/gtf/ncbi_dataset/data/GCF_000001735.4/genomic.gtf"
+gtf: "/home/marc/data/rna_seq_test/test2/gtf/ncbi_dataset/data/Arabidopsis_thaliana.TAIR10.56.gtf"
 results_dir: "/home/marc/results/test2"
-
+#working_dir: "/home/marc/rna_seq"
 
 Trimming: "n"
 adapter_r1: "A"

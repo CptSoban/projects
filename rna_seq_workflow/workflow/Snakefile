@@ -4,9 +4,8 @@
 # - qc after trimming
 # - make trimming optional
 # - option for gz and raw input.fastq
+# - mulitqc
 
-import pandas as pd 
-import numpy as np
 
 # Define input directory and sample names from config file
 configfile: "config.yaml"
@@ -22,10 +21,10 @@ Alignment_tool = config["Alignment_tool"]
 
 
 # Define the final output rule
-rule all:
-    input:
-        expand(results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam", sample=set(samples.sample), aligner=Alignment_tool),
-        f"{results_dir}/feature_counts/{run_id}/{run_id}_counts.txt",
+#rule all:
+ #   input:
+  #      expand(results_dir+"/{aligner}/alignment/{sample}/{sample}.sortedByCoord.out.bam", sample=set(samples.sample), aligner=Alignment_tool),
+   #     f"{results_dir}/feature_counts/{run_id}/{run_id}_counts.txt",
        # f"{results_dir}/feature_counts/{run_id}/mod_{run_id}_counts.csv"
 
 
@@ -35,11 +34,16 @@ rule fastqc:
         seq = seq_dir+"/{sample}_{pos}.fastq"
     output:
         html = results_dir+"/fastqc/{sample}_{pos}_fastqc.html",
-        zip_file = results_dir+"/fastqc/{sample}_{pos}_fastqc.zip"   
+        zip_file = results_dir+"/fastqc/{sample}_{pos}_fastqc.zip"  
+
     params:
         results_dir = results_dir+"/fastqc"
+
     threads:
         config["threads"]
+    conda:
+        "fastqc.yaml"
+
     shell:"""fastqc -t {threads} {input.seq} --outdir {params}"""
 
 #Rule to run cutadapt on all paired-end reads
@@ -56,7 +60,8 @@ rule cutadapt:
         quality_cutoff = "-q "+config["quality_cutoff"] if config["quality_cutoff"] else ""
     threads:
         config["threads"]
-
+    conda:
+        "cutadapt.yaml"
     shell:  """cutadapt -j 2 {params.quality_cutoff} -a {params.adapter_r1} -A {params.adapter_r2} -o {output.trimmed_r1} -p {output.trimmed_r2} {input.seq_r1} {input.seq_r2}"""
 
 if Alignment_tool == "HISAT2":
@@ -70,7 +75,8 @@ if Alignment_tool == "HISAT2":
             basename = results_dir+"/HISAT2/index/"+run_id+"/"+run_id
         threads:
             config["threads"]
-
+        conda:
+            "hisat2.yaml"
         shell: """mkdir {params.index_dir} && hisat2-build -p {threads} {input} {params.basename}"""       
 
     rule hisat2_align:
@@ -86,7 +92,8 @@ if Alignment_tool == "HISAT2":
             indexed_genome_prefix = results_dir+"/{aligner}/index/"+run_id+"/"+run_id
         threads:
             config["threads"]
-
+        conda:
+            "hisat2.yaml"
         shell: """hisat2 -p {threads} -x {params.indexed_genome_prefix} -1 {input.r1} -2 {input.r2} --summary-file {log.summary} --met-file {log.metrics} | samtools sort -o {output.bam_file}"""
 
 elif Alignment_tool == "STAR":
@@ -97,7 +104,8 @@ elif Alignment_tool == "STAR":
             directory(results_dir+"/STAR/index/"+run_id)
         threads:
             config["threads"]
-
+        conda:
+            "star.yaml"
         shell: """STAR --runMode genomeGenerate --genomeDir {output} --genomeFastaFiles {input} """
     
     rule star_align:
@@ -109,8 +117,9 @@ elif Alignment_tool == "STAR":
             bam_file = results_dir+"/{aligner}/alignment/"+run_id+"/{sample}.sortedByCoord.out.bam"
         params:
             output_prefix = results_dir+"/{aligner}/alignment/{sample}/{sample}"
-
         threads: config["threads"]
+        conda:
+            "star.yaml"
 
         shell: """STAR runMode alignReads --runThreadN {threads} --genomeDir {input.indexed_genome} --readFilesIn {input.r1}, {input.r2} --readFilesCommand zcat --outFileNamePrefix {params.output_prefix} --outSAMtype BAM SortedByCoordinate"""
 
@@ -122,8 +131,10 @@ rule featureCounts:
         counts_table = f"{results_dir}/feature_counts/{run_id}/{run_id}_counts.txt"
 
     threads: config["threads"]
+    conda:
+        "subread.yaml"
 
-    shell: """featureCounts -T {threads} -p -t "gene" --extraAttributes "gene" -a {input.gtf} -o {output.counts_table} {input.bam_files}"""
+    shell: """featureCounts -T {threads} -p --extraAttributes "gene" -a {input.gtf} -o {output.counts_table} {input.bam_files}"""
 
 rule deseq2_prep:
     input:
@@ -134,39 +145,10 @@ rule deseq2_prep:
         mapID = f"{results_dir}/feature_counts/{run_id}/{run_id}_mapid.csv"
     log:
         filtered = f"{results_dir}/feature_counts/{run_id}/abundance_filter.log"
-    run:
-        #Read in counts table
-        counts_df = pd.read_csv(input.counts_table, sep= "\t", header=1)
-
-        #Filters out genes with less than 10 counts across all samples
-        unfiltered_counts = len(counts_df.index)
-        counts_df = counts_df[counts_df.iloc[:, 7:].sum(axis=1) >= 10]
-        filtered_counts = len(counts_df.index)
-        with open(log.filtered, "w") as log_file:
-            log_file.write(f"From {unfiltered_counts} genes, {filtered_counts} occured at least 10 times across samples and where used for subsequent analysis")
-        
-        #Makes a copy of the "Geneid" and "gene" column, which can be used to convert Gene IDs to Gene symbols for GO-Analysis and GSEA)
-        symbols_df = counts_df.filter(items=["Geneid","gene"])
-        symbols_df.to_csv(output.mapID, index=False)
-        #Drop unnecessary columns that would stop DESeq2 from correctly identifying the count table
-        counts_df = counts_df.drop(["Chr","Start","End","Strand","Length","gene"], axis=1)
-       
-
-        #Replace "realpath" for sample id as column name
-        for col_name in counts_df.columns:
-            new_col_name = Path(col_name).stem.removesuffix(".sortedByCoord.out")
-            counts_df.rename(columns={col_name: new_col_name}, inplace=True)
-
-        #Read in sample information (e.g. "treated" or "control")
-        sample_info_df = pd.read_csv(input.sample_info, sep="\t", header=0)
-        #Put sample ids from sample information in a list
-        sorted_sample_list = sample_info_df["sample"].tolist()
-        sorted_sample_list.insert(0, "Geneid") 
-
-        #Orders the columns based on the order of sample ids in the sample information (Requiered by DESeq2)
-        counts_df = counts_df[sorted_sample_list]
-
-        counts_df.to_csv(output.prep_counts_table, index=False)
+    conda:
+        "deseq2_prep.yaml"
+    script:
+        "deseq2_prep.py"
 
 rule deseq2:
     input:
@@ -177,8 +159,9 @@ rule deseq2:
         deg_table = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_deseq2_results.csv",
         filt_deg_table = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_sig_deseq2_results.csv",
         mod_deg_table = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv",
-        disp_plot = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_dispersion_plot.pdf",
-        pca_plot = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_pca_plot.pdf"
+        normalized_counts = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_normalized_counts.csv",
+        disp_plot = f"{results_dir}/DEG_analysis/{run_id}/plots/{run_id}_dispersion_plot.pdf",
+        pca_plot = f"{results_dir}/DEG_analysis/{run_id}/plots/{run_id}_pca_plot.pdf"
     conda:
         "deg_analysis.yaml"
     script:
@@ -186,12 +169,37 @@ rule deseq2:
 
 rule volcano:
     input:
-        deg_table = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_deseq2_results.csv",
-        filt_deg_table = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_deseq2_results_padj005.csv",
-        mod_deg_table = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv"
+        mod_deg_table = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv",
     output:
-        volcano_plot = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_volcano_plot.pdf",
+        volcano_plot = f"{results_dir}/DEG_analysis/{run_id}/plots/{run_id}_volcano_plot.pdf",
     conda:
         "enhanced_volcano.yaml"
     script:
         "volcano_plotting.R"
+
+rule heatmap:
+    input:
+        sample_info = f"{seq_dir}/{run_id}_info.txt",
+        mod_deg_table = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv",
+        normalized_counts = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_normalized_counts.csv",
+    output:
+        heatmap_plot = f"{results_dir}/DEG_analysis/{run_id}/plots/{run_id}_heatmap.pdf",
+    conda:
+        "complex_heatmap.yaml"
+    script:
+        "heatmap_plotting.R"
+
+rule gsea:
+    input:
+        mod_deg_table = f"{results_dir}/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv",
+    output:
+        gsea_results = f"{results_dir}/DEG_analysis/gsea/{run_id}/{run_id}_gsea_gobp.csv",
+    params:
+        seed = 27
+    conda:
+        "gsea.yaml"
+    script:
+        "gsea.py"
+
+rule mulitqc:
+    input:

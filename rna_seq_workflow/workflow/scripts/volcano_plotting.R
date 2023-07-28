@@ -2,19 +2,20 @@ library(ggplot2)
 library(EnhancedVolcano)
 library(tidyverse)
 
+#Ranked DeSeq2 results (log2FC/padj)
+mod_res <- read.csv(snakemake@input[["mod_deg_table"]])
 
-deseq2_res <- read.csv(snakemake@input[["mod_deg_table"]])
-
-top_res <- c(head(deseq2_res$symbol, 10))
+#Top ranked DeSeq2 results
+top_res <- c(head(mod_res$symbol, 10))
 
 #VOLCANO PLOT
 
 #Build Volcano Plot
 pdf(snakemake@output[["volcano_plot"]])
-EnhancedVolcano(deseq2_res,
+EnhancedVolcano(mod_res,
                 x = "log2FoldChange",
                 y = "padj",
-                lab = deseq2_res$symbol,
+                lab = top_res$symbol,
                 selectLab = top_res,
                 pCutoff = 0.05,
                 FCcutoff = 1,
