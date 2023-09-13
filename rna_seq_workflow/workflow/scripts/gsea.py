@@ -8,8 +8,8 @@ mod_res = pd.read_csv(snakemake.input["mod_deg_table"])
 gene_ranking = mod_res[["symbol", "rank"]]
 gene_ranking.dropna(inplace = True)
 gene_ranking = gene_ranking.drop_duplicates(subset = "symbol", keep="first")
-
-pre_res = gp.prerank(rnk = gene_ranking, gene_sets = 'GO_Biological_Process_2023', seed = snakemake.input["seed"])
+print(gene_ranking)
+pre_res = gp.prerank(rnk = gene_ranking, gene_sets = 'GO_Biological_Process_2023', seed = snakemake.params["seed"], max_size=10000)
 
 out = []
 for term in list(pre_res.results):

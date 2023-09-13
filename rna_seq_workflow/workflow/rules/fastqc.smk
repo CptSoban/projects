@@ -1,15 +1,18 @@
 # Rule to run FastQC on all samples
 rule fastqc:
     input: 
-        seq = seq_dir+"/{sample}_{pos}.fastq"
+        seq = config["seq_dir"]+"/{sample}_{group}.fastq",
+    
     output:
-        html = working_dir+"/workflow/report/{sample}_{pos}_fastqc.html",
-        zip_file = working_dir+"/workflow/report/{sample}_{pos}_fastqc.zip"
+        html = "/home/marc/projects/rna_seq_workflow/results/fastqc/{sample}_{group}fastqc.html",
+        zip_file = "/home/marc/projects/rna_seq_workflow/results/fastqc/{sample}_{group}fastqc.zip"
+    
     params:
-        out_dir = f"{working_dir}/workflow/report"
+        out_dir = "/home/marc/projects/rna_seq_workflow/results/fastqc",
+    
     threads:
         config["threads"]
-    conda:
-        f"{working_dir}/workflow/envs/fastqc.yaml"
+    
+    conda:  "../envs/fastqc.yaml"
 
     shell:"""fastqc -t {threads} {input.seq} --outdir {params.out_dir}"""
