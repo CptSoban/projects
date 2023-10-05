@@ -1,17 +1,40 @@
-seq_dir: "/home/marc/data/rna_seq_test/test2/reads"
-ref_genome: "/home/marc/data/rna_seq_test/test2/reference_genome/GCF_000001735.4_TAIR10.1_genomic.fna"
-Run ID: "Arabidopsis_thaliana"
-gtf: "/home/marc/data/rna_seq_test/test2/gtf/ncbi_dataset/data/Arabidopsis_thaliana.TAIR10.56.gtf"
-results_dir: "/home/marc/results/test2"
-#working_dir: "/home/marc/rna_seq"
+#This is the configuration file for the rna_seq_worklow.
+#You have to modify this file to your needs and fill out every option (if not stated otherwise), 
+#but do not add or remove options if your not 100% sure what you are doing!
 
-Trimming: "n"
-adapter_r1: "A"
-adapter_r2: "A"
+#INPUT
+
+#Absolute path to your RNAseq reads directory
+seq_dir: "/home/marc/data/rna_seq_foxy/reads"
+
+#Absolute path to the reference genome fasta
+ref_genome: "/home/marc/data/rna_seq_foxy/genome/GCF_000149955.1/GCF_000149955.1_ASM14995v2_genomic.fna"
+
+#The ID for this analyis run (This will be used for naming the genome index files)
+Run ID: "FOXG_ASM14995v2"
+
+#Absolute path to the  GTF 
+gtf: "/home/marc/data/rna_seq_foxy/genome/GCF_000149955.1/genomic.gtf"
+
+#Sample info file 
+sample_info:  "/home/marc/projects/rna_seq_workflow/resources/fusarium_oxysporum_info.tsv"
+
+#PARAMETERS
+
+#Computational ressources
 threads:  3
 
-#Choose between STAR (computational intensive! Use HPC) or HISAT2
-Alignment_tool: "HISAT2"
+#cutadapt
+Trimming: "no" #yes or no
+adapter_r1: "A" #adapter sequence forward reads
+adapter_r2: "A" #adapter sequence reverse reads
+quality_cutoff: ""  #quality filtering (leave empty for no filtering)
 
-#Optional: Choose a quality cutoff value for your reads
-quality_cutoff: ""
+#Tool for alignment (hisat2 or star)
+Aligner: "hisat2"
+
+#Strandness 0 for Unstranded, 1 for Stranded or 2 for Reverse Strranded
+Strandness: 1
+
+#Gene set enrichment analysis (GSEA)
+GSEA gene set: "GO_Biological_Process_2023"

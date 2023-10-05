@@ -3,12 +3,13 @@ library(ggplot2)
 library(tidyverse)
 library(ComplexHeatmap)
 
-#Ranked DeSeq2 results (log2FC/padj)
+#Ranked DeSeq2 results
 mod_res <- read.csv(snakemake@input[["mod_deg_table"]])
 
 #Top ranked DeSeq2 results
 top_res <- (c(head(mod_res, 50)))
 top_res_df <- data.frame(top_res)
+
 #IDs as rownames
 top_res_df <- column_to_rownames(top_res_df, var = "symbol")
 

@@ -5,8 +5,6 @@ rule deseq2:
        # mapID = "/home/marc/projects/rna_seq_workflow/results/feature_counts/{run_id}_mapid.csv"
     output:
         deg_table = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}_deseq2_results.csv",
-        degLFC_table = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}_deseq2_results_LFC.csv",
-        filt_deg_table = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}_sig_deseq2_results.csv",
         mod_deg_table = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}_mod_deseq2_results.csv",
         normalized_counts = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}_normalized_counts.csv",
         disp_plot = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/plots/{run_id}_dispersion_plot.pdf",

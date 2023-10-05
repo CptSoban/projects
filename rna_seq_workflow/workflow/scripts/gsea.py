@@ -3,13 +3,10 @@ import numpy as np
 import gseapy as gp
 from gseapy.plot import gseaplot
 
-mod_res = pd.read_csv(snakemake.input["mod_deg_table"])
-
-gene_ranking = mod_res[["symbol", "rank"]]
-gene_ranking.dropna(inplace = True)
-gene_ranking = gene_ranking.drop_duplicates(subset = "symbol", keep="first")
+gene_ranking = pd.read_csv(snakemake.input["preranked_genes"], header=None)
+#gene_ranking = gene_ranking.drop([0])
 print(gene_ranking)
-pre_res = gp.prerank(rnk = gene_ranking, gene_sets = 'GO_Biological_Process_2023', seed = snakemake.params["seed"], max_size=10000)
+pre_res = gp.prerank(rnk = gene_ranking, gene_sets = snakemake.params["gene_set"], seed = snakemake.params["seed"], min_size=2, max_size=1500, verbose=True)
 
 out = []
 for term in list(pre_res.results):
