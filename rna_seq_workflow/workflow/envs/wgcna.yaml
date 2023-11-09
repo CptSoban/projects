@@ -1,0 +1,9 @@
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - r-base=4.2.0
+ - r-tidyverse=2.0.0
+ - r-corrplot=0.92
+ - r-gridextra=2.3
+ - r-wgcna=1.71

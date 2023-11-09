@@ -43,14 +43,3 @@ mod_res <- res[, c("source",
                     )]
 
 write.csv(mod_res, snakemake@output[["enriched_functions"]])
-
-# pdf(snakemake@output[["enriched_functions"]])
-# publish_gosttable(enriched_functions,
-#                  highlight_terms = enriched_functions$result[c(1:10), ],
-#                  use_colors = FALSE,
-#                  show_columns = c("source",
-#                                 "term_name",
-#                                 "term_size",
-#                                 "intersection_size"),
-#                   )
-# dev.off()

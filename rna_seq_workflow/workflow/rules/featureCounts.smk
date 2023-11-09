@@ -21,4 +21,4 @@ rule featureCounts:
     conda:
         "../envs/featureCounts.yaml"
 
-    shell: """featureCounts -T {threads} -s {params.strandness} -p -a {input.gtf} -o {output.counts_table} {input.bam_files}"""
+    shell: """featureCounts -T {threads} -s {params.strandness} -p --countReadPairs --extraAttributes 'product' -a {input.gtf} -o {output.counts_table} {input.bam_files}"""

@@ -1,7 +1,3 @@
-#               Alignmentrate is a little fishy (~60% unique concordant maps)
-#               Features can only be assgined to ~50% of them, unusually low?
-#               Reads seem to be reverse stranded (-> highest assignment rate in featurecounts)
-
 from snakemake.utils import min_version
 min_version("7.25")
 
@@ -22,6 +18,7 @@ rule all:
         expand("/home/marc/projects/rna_seq_workflow/results/DEG_analysis/plots/{run_id}_heatmap.pdf", run_id=config["Run ID"]),
         expand("/home/marc/projects/rna_seq_workflow/results/DEG_analysis/plots/{run_id}_volcano_plot.pdf", run_id=config["Run ID"]),
         expand("/home/marc/projects/rna_seq_workflow/results/GSEA/{run_id}_prerank.csv", run_id=config["Run ID"]),
+        expand("/home/marc/projects/rna_seq_workflow/results/feature_counts/{run_id}_product_annotation.csv", run_id=config["Run ID"]),
         expand("/home/marc/projects/rna_seq_workflow/results/GSEA/{run_id}_gsea_table.csv", run_id=config["Run ID"]),
         #expand("/home/marc/projects/rna_seq_workflow/results/GSEA/{run_id}_gsea_{gene_set}.csv", run_id=config["Run ID"], gene_set=config["GSEA gene set"]),
         
@@ -39,3 +36,4 @@ include:    "rules/volcano.smk"
 include:    "rules/heatmap.smk"
 include:    "rules/gsea_prep.smk"
 include:    "rules/g_profiler.smk"
+#include:    "rules/wgcna.smk"
