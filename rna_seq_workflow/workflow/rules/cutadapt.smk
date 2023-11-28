@@ -6,8 +6,8 @@ rule cutadapt:
         r2 = config["seq_dir"]+"/{sample}_R2.fastq"
 
     output:
-        trimmed_r1 = "/home/marc/projects/rna_seq_workflow/results/cutadapt/trim_{sample}_R1.fastq",
-        trimmed_r2 = "/home/marc/projects/rna_seq_workflow/results/cutadapt/trim_{sample}_R2.fastq"
+        trimmed_r1 = "/home/marc/projects/rna_seq_workflow/results/cutadapt/{run_id}/trim_{sample}_R1.fastq",
+        trimmed_r2 = "/home/marc/projects/rna_seq_workflow/results/cutadapt/{run_id}/trim_{sample}_R2.fastq"
 
     params:
         adapter_r1 = config["adapter_r1"],

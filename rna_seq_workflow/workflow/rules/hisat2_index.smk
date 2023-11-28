@@ -5,11 +5,11 @@ rule hisat2_index:
         config["ref_genome"]
 
     output:
-        index_files = "/home/marc/projects/rna_seq_workflow/results/hisat2_index/"+config["Run ID"]+".1.ht2"
+        index_files = "/home/marc/projects/rna_seq_workflow/results/hisat2_index/{run_id}/{run_id}.1.ht2"
 
     params:
-        index_dir = directory("/home/marc/projects/rna_seq_workflow/results/hisat2_index/"+config["Run ID"]),
-        basename = "/home/marc/projects/rna_seq_workflow/results/hisat2_index/"+config["Run ID"]
+        index_dir = directory("/home/marc/projects/rna_seq_workflow/results/hisat2_index/{run_id}"),
+        basename = "/home/marc/projects/rna_seq_workflow/results/hisat2_index/{run_id}/{run_id}",
 
     threads:
         config["threads"]

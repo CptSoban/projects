@@ -8,8 +8,9 @@ samples = glob_wildcards(config["seq_dir"]+"/{sample}_{group}.fastq")
 rule all:
     input:
         expand("/home/marc/projects/rna_seq_workflow/results/fastqc/{sample}_{group}_fastqc.{ext}", sample=set(samples.sample), group=["R1","R2"], ext=["html","zip"]),
-        #expand("/home/marc/projects/rna_seq_workflow/results/{aligner}_align/fr_strandness/{sample}.sortedByCoord.out.bam", sample=set(samples.sample), aligner=config["Aligner"]),
-        #expand("/home/marc/projects/rna_seq_workflow/results/feature_counts/{run_id}_counts.txt", run_id=config["Run ID"]),
+        expand("/home/marc/projects/rna_seq_workflow/results/hisat2_index/{run_id}/{run_id}.1.ht2", run_id=config["Run ID"]),
+        expand("/home/marc/projects/rna_seq_workflow/results/{aligner}_align/{run_id}/{sample}.sortedByCoord.out.bam", sample=set(samples.sample), run_id=config["Run ID"], aligner=config["Aligner"]),
+        expand("/home/marc/projects/rna_seq_workflow/results/feature_counts/{run_id}_counts.txt", run_id=config["Run ID"]),
         expand("/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}_deseq2_results.csv", run_id=config["Run ID"]),
         expand("/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}_mod_deseq2_results.csv", run_id=config["Run ID"]),
         expand("/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}_normalized_counts.csv", run_id=config["Run ID"]),
@@ -17,9 +18,10 @@ rule all:
         expand("/home/marc/projects/rna_seq_workflow/results/DEG_analysis/plots/{run_id}_pca_plot.pdf", run_id=config["Run ID"]),
         expand("/home/marc/projects/rna_seq_workflow/results/DEG_analysis/plots/{run_id}_heatmap.pdf", run_id=config["Run ID"]),
         expand("/home/marc/projects/rna_seq_workflow/results/DEG_analysis/plots/{run_id}_volcano_plot.pdf", run_id=config["Run ID"]),
-        expand("/home/marc/projects/rna_seq_workflow/results/GSEA/{run_id}_prerank.csv", run_id=config["Run ID"]),
-        expand("/home/marc/projects/rna_seq_workflow/results/feature_counts/{run_id}_product_annotation.csv", run_id=config["Run ID"]),
-        expand("/home/marc/projects/rna_seq_workflow/results/GSEA/{run_id}_gsea_table.csv", run_id=config["Run ID"]),
+        expand("/home/marc/projects/rna_seq_workflow/results/feature_counts/{run_id}/{run_id}_product_annotation.csv", run_id=config["Run ID"]),
+        expand("/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_main_results.csv", run_id=config["Run ID"]),
+        expand("/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_protein.fasta", run_id=config["Run ID"]),
+        #expand("/home/marc/projects/rna_seq_workflow/results/GSEA/{run_id}_gsea_table.csv", run_id=config["Run ID"]),
         #expand("/home/marc/projects/rna_seq_workflow/results/GSEA/{run_id}_gsea_{gene_set}.csv", run_id=config["Run ID"], gene_set=config["GSEA gene set"]),
         
 include:    "rules/fastqc.smk"
@@ -34,6 +36,7 @@ include:    "rules/deseq2_prep.smk"
 include:    "rules/deseq2.smk"
 include:    "rules/volcano.smk"
 include:    "rules/heatmap.smk"
-include:    "rules/gsea_prep.smk"
-include:    "rules/g_profiler.smk"
+include:    "rules/protein_seq_extract.smk"
+#include:    "rules/gsea_prep.smk"
+#include:    "rules/g_profiler.smk"
 #include:    "rules/wgcna.smk"
