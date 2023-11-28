@@ -1,5 +1,2 @@
 #Snakemake
 .snakemake
-
-#InterproScan
-../.interproscan
