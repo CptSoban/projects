@@ -8,6 +8,8 @@ rule protein_seq_extract:
     output:
         gtf_database = "/home/marc/projects/rna_seq_workflow/resources/{run_id}_gtf_db",
         main_results = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_main_results.csv",
+        positive_DEGs = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_positive_DEGs.csv",
+        negative_DEGs = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_negative_DEGs.csv",
         extracted_protein_sequences = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_protein.fasta",
 
     conda:

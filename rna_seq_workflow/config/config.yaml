@@ -8,13 +8,13 @@
 seq_dir: "/home/marc/data/rna_seq_foxy/reads"
 
 #Absolute path to the reference genome fasta
-ref_genome: "/home/marc/data/rna_seq_foxy/genome/GCF_013085055.1/GCF_013085055.1_ASM1308505v1_genomic.fna"
+ref_genome: "/home/marc/data/rna_seq_foxy/genome/GCF_000149955.1/GCF_000149955.1_ASM14995v2_genomic.fna"
 
 #The ID for this analyis run (This will be used for naming the genome index files)
-Run ID: "ASM1308505v1"
+Run ID: "FOXG_ASM14995v2"
 
 #Absolute path to the  GTF 
-gtf: "/home/marc/data/rna_seq_foxy/genome/GCF_013085055.1/genomic.gtf"
+gtf: "/home/marc/data/rna_seq_foxy/genome/GCF_000149955.1/genomic.gtf"
 
 #Sample info file 
 sample_info:  "/home/marc/projects/rna_seq_workflow/resources/fusarium_oxysporum_info.tsv"

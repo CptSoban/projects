@@ -7,8 +7,8 @@ rule deseq2:
         deg_table = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_deseq2_results.csv",
         mod_deg_table = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv",
         normalized_counts = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_normalized_counts.csv",
-        disp_plot = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/plots/{run_id}/{run_id}_dispersion_plot.pdf",
-        pca_plot = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/plots/{run_id}/{run_id}_pca_plot.pdf"
+        disp_plot = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/plots/{run_id}_dispersion_plot.pdf",
+        pca_plot = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/plots/{run_id}_pca_plot.svg"
     conda:
         "../envs/deg_analysis.yaml"
     script:

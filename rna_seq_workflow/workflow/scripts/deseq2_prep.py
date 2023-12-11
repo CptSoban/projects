@@ -7,11 +7,10 @@ counts_df = pd.read_csv(snakemake.input["counts_table"], sep= "\t", header=1)
 
 #Filters out genes with less than 10 counts across all samples
 unfiltered_counts = len(counts_df.index)
-min_counts = 50
-counts_df = counts_df[counts_df.iloc[:, 7:].sum(axis=1) >= min_counts] # Removes genes with a total count across samples of less than min_counts
+counts_df = counts_df[counts_df.iloc[:, 7:].sum(axis=1) >= 50] # Removes genes with a total count across samples of less than min_counts
 filtered_counts = len(counts_df.index)
 with open(snakemake.log["filtered"], "w") as log_file:
-    log_file.write(f"From {unfiltered_counts} genes, {filtered_counts} occured at least {min_counts} times across samples and where used for subsequent analysis")
+    log_file.write(f"From {unfiltered_counts} genes, {filtered_counts} occured at least 50 times across samples and where used for subsequent analysis")
 
 #Makes a copy of the "Geneid" and "product" column
 products_df = counts_df.filter(items=["Geneid","product"])

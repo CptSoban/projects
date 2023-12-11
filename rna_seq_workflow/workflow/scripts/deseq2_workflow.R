@@ -75,6 +75,6 @@ plotDispEsts(dds)
 dev.off()
 
 #PCA
-pdf(snakemake@output[["pca_plot"]])
-plotPCA(vsdata) + geom_text(aes(label=name),vjust=2)
+svg(snakemake@output[["pca_plot"]])
+plotPCA(vsdata) + geom_text(aes(label=name),vjust=0,hjust=2)+ theme_bw()
 dev.off()
