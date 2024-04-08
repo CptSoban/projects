@@ -8,10 +8,10 @@ elif config["Strandness"] == "Unstranded":
 rule featureCounts:
     input:
         gtf = config["gtf"],
-        bam_files = expand("/home/marc/projects/rna_seq_workflow/results/{aligner}_align/{run_id}/{sample}.sortedByCoord.out.bam", aligner=config["Aligner"], run_id=config["Run ID"], sample=set(samples.sample))
+        bam_files = expand(config["workflow_dir"]+"/results/{aligner}_align/{run_id}/{sample}.sortedByCoord.out.bam", aligner=config["Aligner"], run_id=config["Run ID"], sample=set(samples.sample))
 
     output:
-        counts_table = "/home/marc/projects/rna_seq_workflow/results/feature_counts/{run_id}/{run_id}_counts.txt",
+        counts_table = config["workflow_dir"]+"/results/feature_counts/{run_id}/{run_id}_counts.txt",
         
     params:
         strandness = 2

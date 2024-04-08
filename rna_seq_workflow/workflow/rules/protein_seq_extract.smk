@@ -1,16 +1,17 @@
 rule protein_seq_extract:
     input:
-        mod_deg_table = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv",
-        product_annotation = "/home/marc/projects/rna_seq_workflow/results/feature_counts/{run_id}/{run_id}_product_annotation.csv",
-        gtf = config["gtf"],
+        mod_deg_table = config["workflow_dir"]+"/results/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv",
+        product_annotation = config["workflow_dir"]+"/results/feature_counts/{run_id}/{run_id}_product_annotation.csv",
+        gtf_database = config["workflow_dir"]+"/resources/{run_id}_gtf_db",
         ref_protein_fasta = config["protein_fasta"],
 
     output:
-        gtf_database = "/home/marc/projects/rna_seq_workflow/resources/{run_id}_gtf_db",
-        main_results = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_main_results.csv",
-        positive_DEGs = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_positive_DEGs.csv",
-        negative_DEGs = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_negative_DEGs.csv",
-        extracted_protein_sequences = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_protein.fasta",
+        main_results = config["workflow_dir"]+"/results/DEG_analysis/{run_id}/{run_id}_main_results.csv",
+        positive_DEGs = config["workflow_dir"]+"/results/DEG_analysis/{run_id}/{run_id}_positive_DEGs.csv",
+        negative_DEGs = config["workflow_dir"]+"/results/DEG_analysis/{run_id}/{run_id}_negative_DEGs.csv",
+        all_protein_sequences = config["workflow_dir"]+"/results/DEG_analysis/{run_id}/{run_id}_protein.fasta",
+        pos_protein_sequences = config["workflow_dir"]+"/results/DEG_analysis/{run_id}/{run_id}_pos_protein.fasta",
+        neg_protein_sequences = config["workflow_dir"]+"/results/DEG_analysis/{run_id}/{run_id}_neg_protein.fasta",
 
     conda:
         "../envs/protein_seq_extract.yaml"

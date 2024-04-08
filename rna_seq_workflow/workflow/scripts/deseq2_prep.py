@@ -5,9 +5,9 @@ from pathlib import Path
 #Read in counts table
 counts_df = pd.read_csv(snakemake.input["counts_table"], sep= "\t", header=1)
 
-#Filters out genes with less than 10 counts across all samples
+#Filters out genes with less than 50 counts across all samples
 unfiltered_counts = len(counts_df.index)
-counts_df = counts_df[counts_df.iloc[:, 7:].sum(axis=1) >= 50] # Removes genes with a total count across samples of less than min_counts
+counts_df = counts_df[counts_df.iloc[:, 7:].sum(axis=1) >= 50]
 filtered_counts = len(counts_df.index)
 with open(snakemake.log["filtered"], "w") as log_file:
     log_file.write(f"From {unfiltered_counts} genes, {filtered_counts} occured at least 50 times across samples and where used for subsequent analysis")

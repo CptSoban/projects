@@ -8,18 +8,18 @@ elif config["Strandness"] == "Unstranded":
 
 rule hisat2_align:
     input:
-        r1 = "/home/marc/projects/rna_seq_workflow/results/cutadapt/{run_id}/trim_{sample}_R1.fastq" if config["Trimming"] == "yes" else config["seq_dir"]+"/{sample}_R1.fastq",
-        r2 = "/home/marc/projects/rna_seq_workflow/results/cutadapt/{run_id}/trim_{sample}_R2.fastq" if config["Trimming"] == "yes" else config["seq_dir"]+"/{sample}_R2.fastq",
-        index_files = "/home/marc/projects/rna_seq_workflow/results/hisat2_index/{run_id}/{run_id}.1.ht2"
+        r1 = config["workflow_dir"]+"/results/cutadapt/{run_id}/trim_{sample}_R1.fastq" if config["Trimming"] == "yes" else config["seq_dir"]+"/{sample}_R1.fastq",
+        r2 = config["workflow_dir"]+"/results/cutadapt/{run_id}/trim_{sample}_R2.fastq" if config["Trimming"] == "yes" else config["seq_dir"]+"/{sample}_R2.fastq",
+        index_files = config["workflow_dir"]+"/results/hisat2_index/{run_id}/{run_id}.1.ht2"
     output:
-        bam_file = "/home/marc/projects/rna_seq_workflow/results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam"
+        bam_file = config["workflow_dir"]+"/results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam"
 
     log:
-        summary = "/home/marc/projects/rna_seq_workflow/reports/hisat2_align/{run_id}/{sample}_summary.log",
-        metrics = "/home/marc/projects/rna_seq_workflow/reports/hisat2_align/{run_id}/{sample}_metrics.log"
+        summary = config["workflow_dir"]+"/reports/hisat2_align/{run_id}/{sample}_summary.log",
+        metrics = config["workflow_dir"]+"/reports/hisat2_align/{run_id}/{sample}_metrics.log"
 
     params:
-        basename = "/home/marc/projects/rna_seq_workflow/results/hisat2_index/{run_id}/{run_id}",
+        basename = config["workflow_dir"]+"/results/hisat2_index/{run_id}/{run_id}",
         strandness = "RF"
     threads:
         config["threads"]

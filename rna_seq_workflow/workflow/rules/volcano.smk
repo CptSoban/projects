@@ -1,8 +1,8 @@
 rule volcano:
     input:
-        mod_deg_table = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv",
+        mod_deg_table = config["workflow_dir"]+"/results/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv",
     output:
-        volcano_plot = "/home/marc/projects/rna_seq_workflow/results/DEG_analysis/{run_id}/plots/{run_id}_volcano_plot.pdf",
+        volcano_plot = config["workflow_dir"]+"/results/DEG_analysis/{run_id}/plots/{run_id}_volcano_plot.pdf",
     conda:
         "../envs/enhanced_volcano.yaml"
     script:

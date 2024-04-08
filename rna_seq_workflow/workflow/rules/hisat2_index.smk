@@ -5,11 +5,11 @@ rule hisat2_index:
         config["ref_genome"]
 
     output:
-        index_files = "/home/marc/projects/rna_seq_workflow/results/hisat2_index/{run_id}/{run_id}.1.ht2"
+        index_files = config["workflow_dir"]+"/results/hisat2_index/{run_id}/{run_id}.1.ht2"
 
     params:
-        index_dir = directory("/home/marc/projects/rna_seq_workflow/results/hisat2_index/{run_id}"),
-        basename = "/home/marc/projects/rna_seq_workflow/results/hisat2_index/{run_id}/{run_id}",
+        index_dir = directory(config["workflow_dir"]+"/results/hisat2_index/{run_id}"),
+        basename = config["workflow_dir"]+"/results/hisat2_index/{run_id}/{run_id}",
 
     threads:
         config["threads"]
@@ -17,4 +17,4 @@ rule hisat2_index:
     conda:
         "../envs/hisat2.yaml"
 
-    shell: """mkdir {params.index_dir} && hisat2-build -p {threads} {input} {params.basename}""" 
+    shell: """mkdir -p {params.index_dir} && hisat2-build -p {threads} {input} {params.basename}""" 
