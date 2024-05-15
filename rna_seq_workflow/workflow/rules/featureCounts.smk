@@ -1,20 +1,13 @@
-if config["Strandness"] == "Forward":
-    strandness = 1
-elif config["Strandness"] == "Reverse":
-    strandness = 2
-elif config["Strandness"] == "Unstranded":
-    strandness = 0
-
 rule featureCounts:
     input:
         gtf = config["gtf"],
-        bam_files = expand(config["workflow_dir"]+"/results/{aligner}_align/{run_id}/{sample}.sortedByCoord.out.bam", aligner=config["Aligner"], run_id=config["Run ID"], sample=set(samples.sample))
+        bam_files = expand(config["workflow_dir"]+"/results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam", run_id=config["Run ID"], sample=set(samples.sample))
 
     output:
         counts_table = config["workflow_dir"]+"/results/feature_counts/{run_id}/{run_id}_counts.txt",
         
     params:
-        strandness = 2
+        strandness = config["Strandness"][1]
     
     threads: config["threads"]
     

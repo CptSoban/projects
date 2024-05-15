@@ -2,7 +2,7 @@ from snakemake.utils import min_version
 min_version("7.25")
 from pathlib import Path
 
-configfile: "config/config.yaml"
+configfile: "/home/marc/projects/rna_seq_workflow/config/config.yaml"
 
 samples = glob_wildcards(config["seq_dir"]+"/{sample}_{group}.fastq")
 
@@ -10,7 +10,7 @@ rule all:
     input:
         expand("{workflow_dir}/results/fastqc/{run_id}/{sample}_{group}_fastqc.{ext}", workflow_dir=config["workflow_dir"], run_id=config["Run ID"], sample=set(samples.sample), group=["R1","R2"], ext=["html","zip"]),
         expand("{workflow_dir}/results/hisat2_index/{run_id}/{run_id}.1.ht2", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
-        expand("{workflow_dir}/results/{aligner}_align/{run_id}/{sample}.sortedByCoord.out.bam", workflow_dir=config["workflow_dir"], sample=set(samples.sample), run_id=config["Run ID"], aligner=config["Aligner"]),
+        expand("{workflow_dir}/results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam", workflow_dir=config["workflow_dir"], sample=set(samples.sample), run_id=config["Run ID"]),
         expand("{workflow_dir}/results/feature_counts/{run_id}/{run_id}_counts.txt", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
         expand("{workflow_dir}/results/DEG_analysis/{run_id}/{run_id}_deseq2_results.csv", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
         expand("{workflow_dir}/results/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),

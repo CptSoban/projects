@@ -4,28 +4,36 @@
 
 #INPUT
 
-#Absolute path to your RNAseq reads directory
-seq_dir: "/home/marc/data/rna_seq_foxy/reads"
+workflow_dir: /home/marc/projects/rna_seq_workflow
+
+#Absolute path to your RNAseq reads directory. sample names should have the following format: ID_DIRECTION.fastq
+seq_dir: /home/marc/data/rna_seq_foxy/reads/correct_samples
 
 #Absolute path to the reference genome fasta
-ref_genome: "/home/marc/data/rna_seq_foxy/genome/GCF_000149955.1/GCF_000149955.1_ASM14995v2_genomic.fna"
+ref_genome: /home/marc/data/rna_seq_foxy/genome/GCF_000149955.1/GCF_000149955.1_ASM14995v2_genomic.fna
 
 #The ID for this analyis run (This will be used for naming the genome index files)
-Run ID: "FOXG_ASM14995v2"
+Run ID: new_FOXG_ASM14995v2
 
 #Absolute path to the  GTF 
-gtf: "/home/marc/data/rna_seq_foxy/genome/GCF_000149955.1/genomic.gtf"
+gtf: /home/marc/data/rna_seq_foxy/genome/GCF_000149955.1/genomic.gtf
 
 #Sample info file 
-sample_info:  "/home/marc/projects/rna_seq_workflow/resources/fusarium_oxysporum_info.tsv"
+sample_info:  /home/marc/projects/rna_seq_workflow/resources/fusarium_oxysporum_info.tsv
 
 #Absoulte path to reference protein fasta
-protein_fasta: "/home/marc/data/rna_seq_foxy/genome/GCF_000149955.1/protein.faa"
+protein_fasta: /home/marc/data/rna_seq_foxy/genome/GCF_000149955.1/protein.faa
+
+#INTERPROSCAN
+interproscan_dir: /home/marc/appl/interproscan/interproscan-5.66-98.0
+
+#EGGNOG-MAPPER V2 results
+eggnog_results: /home/marc/projects/rna_seq_workflow/results/functional_annotations/new_FOXG_ASM14995v2/eggnog/MM_0t_4hjca.emapper.annotations.tsv
 
 #PARAMETERS
 
 #Computational ressources
-threads:  2
+threads:  4
 
 #cutadapt
 Trimming: "no" #yes or no
@@ -34,10 +42,10 @@ adapter_r2: "A" #adapter sequence reverse reads
 quality_cutoff: ""  #quality filtering (leave empty for no filtering)
 
 #Tool for alignment (hisat2 or star)
-Aligner: "hisat2"
+Aligner: hisat2
 
-#Strandness 0 for Unstranded, 1 for Stranded or 2 for Reverse Strranded
-Strandness: 2
+#Strandness ["",0] for Unstranded, ["FR",1] for Stranded or ["RF",2] for Reverse Stranded
+Strandness: ["RF",2]
 
 #Gene set enrichment analysis (GSEA)
-GSEA gene set: "GO_Biological_Process_2023"
+GSEA gene set: GO_Biological_Process_2023

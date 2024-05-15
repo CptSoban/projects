@@ -1,11 +1,3 @@
-#Rule for aligning reads to the reference genome using HISAT2
-if config["Strandness"] == "Forward":
-    strandness = "FR"
-elif config["Strandness"] == "Reverse":
-    strandness = "RF"
-elif config["Strandness"] == "Unstranded":
-    strandness = ""
-
 rule hisat2_align:
     input:
         r1 = config["workflow_dir"]+"/results/cutadapt/{run_id}/trim_{sample}_R1.fastq" if config["Trimming"] == "yes" else config["seq_dir"]+"/{sample}_R1.fastq",
@@ -20,7 +12,7 @@ rule hisat2_align:
 
     params:
         basename = config["workflow_dir"]+"/results/hisat2_index/{run_id}/{run_id}",
-        strandness = "RF"
+        strandness = config["Strandness"][0]
     threads:
         config["threads"]
 
