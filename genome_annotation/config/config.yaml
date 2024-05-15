@@ -1,0 +1,17 @@
+#INPUT
+
+workflow_dir: /home/marc/projects/genome_annotation/workflow
+
+genome_assembly: /home/marc/projects/genome_annotation/resources/westerdykella_dispersa/genome_assembly/westerdykella_dispersa.fasta
+
+RNA reads directory : /home/marc/projects/genome_annotation/resources/westerdykella_dispersa/rna_seq_reads
+
+Run ID: westerdykella_dispersa
+
+DFAM taxon: eukaryota
+
+Fungi: yes
+
+#PARAMETERS
+
+threads:  4

@@ -1,0 +1,7 @@
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - r-base=4.2.0
+ - r-tidyverse=2.0.0
+ - r-gprofiler2=0.2.2
