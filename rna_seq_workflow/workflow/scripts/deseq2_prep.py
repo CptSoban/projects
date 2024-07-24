@@ -5,19 +5,20 @@ from pathlib import Path
 #Read in counts table
 counts_df = pd.read_csv(snakemake.input["counts_table"], sep= "\t", header=1)
 
-#Filters out genes with less than 50 counts across all samples
+#Filters out genes with less than n counts across all samples
 unfiltered_counts = len(counts_df.index)
-counts_df = counts_df[counts_df.iloc[:, 7:].sum(axis=1) >= 50]
+threshold = 100
+counts_df = counts_df[counts_df.iloc[:, 7:].sum(axis=1) >= threshold]
 filtered_counts = len(counts_df.index)
 with open(snakemake.log["filtered"], "w") as log_file:
-    log_file.write(f"From {unfiltered_counts} genes, {filtered_counts} occured at least 50 times across samples and where used for subsequent analysis")
+    log_file.write(f"From {unfiltered_counts} genes, {filtered_counts} occured at least {threshold} times across samples and where used for subsequent analysis")
 
 #Makes a copy of the "Geneid" and "product" column
-products_df = counts_df.filter(items=["Geneid","product"])
-products_df.to_csv(snakemake.output["product_annotation"], index=False)
+# products_df = counts_df.filter(items=["Geneid","product"])
+# products_df.to_csv(snakemake.output["product_annotation"], index=False)
 
 #Drop unnecessary columns that would stop DESeq2 from correctly identifying the count table
-counts_df = counts_df.drop(["Chr","Start","End","Strand","Length","product"], axis=1)
+counts_df = counts_df.drop(["Chr","Start","End","Strand","Length"], axis=1)
         
        
 #Replace "realpath" for sample id as column name

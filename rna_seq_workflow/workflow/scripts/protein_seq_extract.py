@@ -12,16 +12,16 @@ gffutils.constants.always_return_list = True
 all_genes_df = pd.read_csv(snakemake.input["mod_deg_table"])
 
 #Only keep those columns
-all_genes_df = all_genes_df[["symbol", "log2FC_shrinked", "padj"]]
+all_genes_df = all_genes_df[["symbol", "log2FoldChange", "baseMean", "padj"]]
 
 #Remove any empthy rows
 all_genes_df.dropna(inplace = True)
 
-#Mask to extract significant (0.05 padj) results
-filter_mask_padj = (all_genes_df["padj"] <= 0.05)
+#Mask to filter lowly expressed genes
+filter_mask_baseMean = (all_genes_df["baseMean"] >= 100)
 
 #Table containing significant DEGs and non-DEGs
-most_DEG_df = all_genes_df[filter_mask_padj]
+most_DEG_df = all_genes_df[filter_mask_baseMean]
 
 #Sort the rows (=genes) by their shrinked log2FC value (=Highest expression change first)
 #all_genes_df = all_genes_df.sort_values(by=["log2FC_shrinked"], ascending=False)
@@ -35,10 +35,10 @@ most_DEG_df = all_genes_df[filter_mask_padj]
 
 
 #Contains gene product information orignally contained in the corresponding GTF
-product_annotation_df = pd.read_csv(snakemake.input["product_annotation"])
+# product_annotation_df = pd.read_csv(snakemake.input["product_annotation"])
 
 #Annotates GTF product information to the created dataframe
-most_DEG_df = most_DEG_df.set_index("symbol").join(product_annotation_df.set_index("Geneid"))
+most_DEG_df = most_DEG_df.set_index("symbol")
 
 #Returns string instead of list
 gffutils.constants.always_return_list = False
@@ -54,7 +54,11 @@ for gene_id in gene_ids:
     #The CDS entry contains the protein_id so here for every CDS feature ("children") of a gene of interest 
     #all corresponding protein_ids are appended to a list
     for i in gtf_db.children(gene, featuretype="CDS"):
-        protein_list.append(i["protein_id"])
+        try:
+            protein_list.append(i["protein_id"])
+        #If genome was annotated using BRAKER pipeline
+        except:
+            protein_list.append(i["transcript_id"])
     
     #To remove duplicates the list is turned into a set
     protein_dict[gene_id] = set(protein_list)
@@ -79,13 +83,20 @@ records = list(SeqIO.parse(snakemake.input["ref_protein_fasta"], "fasta"))
 with open(snakemake.output["all_protein_sequences"], "w") as output_all:
     SeqIO.write((record for record in records if record.id in ids_to_extract), output_all, "fasta")
 
+
 #Joining protein_ids with main DEGs dataframe
-most_DEG_df = most_DEG_df.join(protein_df).sort_values(by=['log2FC_shrinked','padj'], ascending=False)
+most_DEG_df = most_DEG_df.join(protein_df).sort_values(by=['log2FoldChange','padj'], ascending=False)
 
 most_DEG_df.to_csv(snakemake.output["main_results"])
 
-#Table containing highly increased DEGs (Treatment->Control)
-positive_DEG_df = most_DEG_df[most_DEG_df["log2FC_shrinked"] >= 1.5]
+#Table containing positive DEGs
+positive_DEG_df = most_DEG_df[most_DEG_df["log2FoldChange"] >= 2.0]
+
+#Mask to filter non-significant positive DEGs
+filter_mask_padj = (positive_DEG_df["padj"] <= 0.05)
+
+#Table containing significant positive DEGs
+positive_DEG_df = positive_DEG_df[filter_mask_padj]
 
 positive_DEG_df.to_csv(snakemake.output["positive_DEGs"])
 
@@ -95,12 +106,18 @@ with open(snakemake.output["pos_protein_sequences"], "w") as output_pos:
     SeqIO.write((record for record in records if record.id in top_500), output_pos, "fasta")
 
 
-#Table containing highly decreased DEGs (Treatment->Control)
-negative_DEG_df = most_DEG_df[most_DEG_df["log2FC_shrinked"] <= 1.5]
+#Table containing negative DEGs
+negative_DEG_df = most_DEG_df[most_DEG_df["log2FoldChange"] <= -2.0]
+
+#Mask to filter non-significant negative DEGs
+filter_mask_padj = (negative_DEG_df["padj"] <= 0.05)
+
+#Table containing significant negative DEGs
+negative_DEG_df = negative_DEG_df[filter_mask_padj]
 
 negative_DEG_df.to_csv(snakemake.output["negative_DEGs"])
 
-bottom_500 = positive_DEG_df["protein_ids"].tail(500).tolist()
+bottom_500 = negative_DEG_df["protein_ids"].tail(500).tolist()
 
 with open(snakemake.output["neg_protein_sequences"], "w") as output_neg:
     SeqIO.write((record for record in records if record.id in bottom_500), output_neg, "fasta")

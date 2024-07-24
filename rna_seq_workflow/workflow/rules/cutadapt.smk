@@ -20,4 +20,11 @@ rule cutadapt:
     conda:
         "../envs/cutadapt.yaml"
 
-    shell:  """cutadapt -j 2 {params.quality_cutoff} -a {params.adapter_r1} -A {params.adapter_r2} -o {output.trimmed_r1} -p {output.trimmed_r2} {input.r1} {input.r2}"""
+    shell: """ cutadapt \
+            -j 2 {params.quality_cutoff} \
+            -a {params.adapter_r1} \
+            -A {params.adapter_r2} \
+            -o {output.trimmed_r1} \
+            -p {output.trimmed_r2} \
+            {input.r1} {input.r2}"""
+       

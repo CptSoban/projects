@@ -5,7 +5,7 @@ library(tidyverse)
 #Ranked DeSeq2 results (log2FC/padj)
 mod_res <- read.csv(snakemake@input[["mod_deg_table"]])
 
-top_over <- head(mod_res$log2FC_shrinked, 5)
+top_over <- head(mod_res$log2FoldChange, 5)
 
 #top_under <- tail(mod_res[order(mod_res$log2FC_shrinked), ], 10)
 
@@ -15,14 +15,14 @@ top_over <- head(mod_res$log2FC_shrinked, 5)
 #     c('FOXG_12350', 'FOXG_03770', 'FOXG_09804', 'FOXG_20229', 'FOXG_11545'),
 #     "')")
 #Top ranked DeSeq2 results
-top_res <- c('FOXG_12350', 'FOXG_03770', 'FOXG_09804', 'FOXG_20229', 'FOXG_11545')
+# top_res <- c('FOXG_12350', 'FOXG_03770', 'FOXG_09804', 'FOXG_20229', 'FOXG_11545')
 
 #VOLCANO PLOT
 
 #Build Volcano Plot
 pdf(snakemake@output[["volcano_plot"]])
 EnhancedVolcano(mod_res,
-                x = "log2FC_shrinked",
+                x = "log2FoldChange",
                 y = "padj",
                 lab = mod_res$symbol,
                 #selectLab = top_res,
