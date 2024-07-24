@@ -1,28 +1,15 @@
 from snakemake.utils import min_version
-min_version("7.25")
+min_version("8.11.3")
 
 configfile: "/home/marc/projects/genome_annotation/config/config.yaml"
 
-# def get_final_output():
-#     final_output = expand(
-#         "{workflow_dir}/results/repeatmasker/{run_id}/{run_id}.fasta.masked", workflow_dir = config["workflow_dir"], run_id = config["Run ID"]
-#     )
-# def get_final_output():
-#     final_output = expand(
-#         "results/diffexp/{contrast}.diffexp.symbol.tsv",
-#         contrast=config["diffexp"]["contrasts"],
-#     )
-    # final_output.append("results/deseq2/normcounts.symbol.tsv")
-    # final_output.append("results/counts/all.symbol.tsv")
-    # final_output.append("results/qc/multiqc_report.html")
+samples = glob_wildcards(config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz")
 
 rule all:
     input:
-        expand("{workflow_dir}/results/repeatmasker/{run_id}/{run_id}.fasta.masked", workflow_dir = config["workflow_dir"], run_id = config["Run ID"]),
-        expand("{workflow_dir}/results/repeatmasker/{run_id}/braker.gtf", workflow_dir = config["workflow_dir"], run_id = config["Run ID"])
-        # get_final_output(),
+        get_final_output()
 
-#include:    "busco.smk"   
+include:    "functions.smk"
 include:    "rules/repeatmasker.smk"
 include:    "rules/BRAKER3.smk"
 

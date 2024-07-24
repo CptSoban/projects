@@ -3,7 +3,7 @@ rule gtf_db:
         gtf = config["gtf"],
 
     output:
-        gtf_database = config["workflow_dir"]+"/resources/{run_id}_gtf_db",
+        gtf_database = "resources/{run_id}_gtf_db",
 
     threads: config["threads"]
     
