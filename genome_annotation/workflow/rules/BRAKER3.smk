@@ -16,16 +16,15 @@ rule decompress_gz:
 rule BRAKER3:
     input:
         expand(config["rna_reads_directory"]+"/{sample}_{group}.fastq", sample=set(samples.sample), group=["1","2"]),
-        augustus_config = config["work_dir"]+"/resources/Augustus/config",
-        masked_genome = config["work_dir"]+"/workflow/results/repeatmasker/{run_id}/{run_id}.fasta.masked",
+        augustus_config = "resources/Augustus/config",
+        masked_genome = "results/repeatmasker/{run_id}/{run_id}.fasta.masked",
         rna_reads_dir = config["rna_reads_directory"],
     output:
-        braker_gtf = config["work_dir"]+"/workflow/results/braker/{run_id}/braker.gtf"
+        braker_gtf = "results/braker/{run_id}/braker.gtf"
     params:
-        # rna_reads_ids = get_basenames(config["rna_reads_directory"]),
         fungi = "--fungus" if config["Fungi"] == "+" else "",
         species_name = config["Run ID"],
-        out_dir = directory(config["work_dir"]+"/workflow/results/braker/{run_id}")
+        out_dir = directory("results/braker/{run_id}")
 
     container:
         "/home/marc/projects/genome_annotation/resources/braker3.sif"
@@ -37,7 +36,7 @@ rule BRAKER3:
 rule compress_gz:
     input:
         rna_reads = config["rna_reads_directory"]+"/{sample}_{group}.fastq",
-        expand(config["work_dir"]+"/workflow/results/braker/{run_id}/braker.gtf", run_id=config["Run ID"])
+        expand("results/braker/{run_id}/braker.gtf", run_id=config["Run ID"])
     output:
         config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz"
 

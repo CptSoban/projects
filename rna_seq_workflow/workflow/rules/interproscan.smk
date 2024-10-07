@@ -4,29 +4,6 @@ import re
 import os
 import time
 
-#If the reference genome was annotated using BRAKER, then there will be asterisks at the of the sequences in .codingseq and .aa
-#indicating the end of the specific sequences. These can be removed without concern, which is necessary for Interproscan.
-rule filter_sequences_with_asterisk:
-    input:
-        all_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/{run_id}_{contrast}.aa",
-    output:
-        cleaned_aa = "results/functional_annotations/{run_id}/{run_id}_{contrast}_clean.aa",
-    run:
-        def filter_sequences_with_asterisk(input_file, output_file):
-            with open(input_file, "r") as input_handle, open(output_file, "w") as output_handle:
-                # Parse the input fasta file
-                sequences = SeqIO.parse(input_handle, "fasta")
-                # Filter sequences that end with an asterisk and do not contain an asterisk elsewhere
-                filtered_sequences = (seq for seq in sequences if seq.seq.endswith("*") and seq.seq.count("*") == 1)
-                # Remove the trailing asterisk from these sequences
-                cleaned_sequences = (seq[:len(seq.seq) - 1] + seq.seq[-1:].replace("*", "") for seq in filtered_sequences)
-                # Write the filtered sequences to the output fasta file
-                SeqIO.write(cleaned_sequences, output_handle, "fasta")
-            return output_file
-        
-        filter_sequences_with_asterisk(input[0], output[0])
-
-
 def latest_interpro_version():
     # Fetch the latest version number
     url = "https://github.com/ebi-pf-team/interproscan"
@@ -75,9 +52,32 @@ def get_latest_interpro_data():
         os.system(pull_command)
         return data_path
 
+
+#If the reference genome was annotated using BRAKER, then there will be asterisks at the of the sequences in .codingseq and .aa
+#indicating the end of the specific sequences. These can be removed without concern, which is necessary for Interproscan.
+rule filter_sequences_with_asterisk:
+    input:
+        all_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/{run_id}_{contrast}.aa",
+    output:
+        cleaned_aa = "results/functional_annotations/{run_id}/{run_id}_{contrast}_clean.aa",
+    run:
+        def filter_sequences_with_asterisk(input_file, output_file):
+            with open(input_file, "r") as input_handle, open(output_file, "w") as output_handle:
+                # Parse the input fasta file
+                sequences = SeqIO.parse(input_handle, "fasta")
+                # Filter sequences that end with an asterisk and do not contain an asterisk elsewhere
+                filtered_sequences = (seq for seq in sequences if seq.seq.endswith("*") and seq.seq.count("*") == 1)
+                # Remove the trailing asterisk from these sequences
+                cleaned_sequences = (seq[:len(seq.seq) - 1] + seq.seq[-1:].replace("*", "") for seq in filtered_sequences)
+                # Write the filtered sequences to the output fasta file
+                SeqIO.write(cleaned_sequences, output_handle, "fasta")
+            return output_file
+        
+        filter_sequences_with_asterisk(input[0], output[0])
+
 rule interproscan_run:
     input:
-        cleaned_aa = "results/DEG_analysis/{run_id}/{contrast}/{run_id}_{contrast}.aa",
+        cleaned_aa = "results/functional_annotations/{run_id}/{run_id}_{contrast}_clean.aa",
         interpro_data = get_latest_interpro_data()
 
     output:

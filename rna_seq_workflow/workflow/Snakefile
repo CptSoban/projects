@@ -22,9 +22,9 @@ def get_final_output():
     final_output = expand("results/fastqc/{run_id}/{sample}_{group}_fastqc.{ext}", 
     run_id=config["Run ID"], sample=set(SAMPLES.sample), group=set(SAMPLES.group), ext=["html","zip"]
     )
-    final_output.append(expand("results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam", run_id=config["Run ID"], sample=set(SAMPLES.sample)))
-    final_output.append(expand("results/feature_counts/{run_id}/{run_id}_counts.txt", run_id=config["Run ID"]))
-    final_output.append(expand("results/feature_counts/{run_id}/mod_{run_id}_counts.csv", run_id=config["Run ID"]))
+    # final_output.append(expand("results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam", run_id=config["Run ID"], sample=set(SAMPLES.sample)))
+    # final_output.append(expand("results/feature_counts/{run_id}/{run_id}_counts.txt", run_id=config["Run ID"]))
+    # final_output.append(expand("results/feature_counts/{run_id}/mod_{run_id}_counts.csv", run_id=config["Run ID"]))
     final_output.append(expand("results/DEG_analysis/{run_id}/{run_id}_dds.rds", run_id=config["Run ID"]))
     final_output.append(expand("results/DEG_analysis/{run_id}/{run_id}_{contrast}.csv", run_id=config["Run ID"], contrast=CONTRAST))
     final_output.append(expand("results/DEG_analysis/{run_id}/plots/{run_id}_heatmap.pdf", run_id=config["Run ID"]))
@@ -49,9 +49,9 @@ include:    "rules/fastqc.smk"
 if config["Trimming"] == "yes":
     include:    "rules/cutadapt.smk"
 
-include:    "rules/hisat2_index.smk"
-include:    "rules/hisat2_align.smk"
-include:    "rules/featureCounts.smk"
+# include:    "rules/hisat2_index.smk"
+# include:    "rules/hisat2_align.smk"
+# include:    "rules/featureCounts.smk"
 include:    "rules/deseq2_prep.smk"
 include:    "rules/deseq2.smk"
 include:    "rules/volcano.smk"

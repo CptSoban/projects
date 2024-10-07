@@ -5,28 +5,28 @@
 #INPUT
 
 #Absolute path to your RNAseq reads directory. sample names should have the following format: ID_GROUP.fastq
-seq_dir: /home/marc/projects/rna_seq_workflow/resources/rna_seq_foxy/reads
+seq_dir: /home/marc/projects/genome_annotation/resources/rna_seq_reads/wesdi_denovo
 
 #Absolute path to the reference genome fasta
-ref_genome: /home/marc/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/GCF_000149955.1_ASM14995v2_genomic.fna
+ref_genome: /home/marc/projects/genome_annotation/resources/genome_assembly/wesdi_denovo/westerdykella_dispersa.fasta
 
 #The ID for this analyis run
-Run ID: 20240716_FOXY
+Run ID: wesdi_denovo
 
 #Absolute path to the genome annotation file (GTF) 
-gtf: /home/marc/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/genomic.gtf
+gtf: /home/marc/projects/genome_annotation/workflow/results/braker/westerdykella_dispersa/braker.gtf
 
 #Sample info file 
-sample_info: /home/marc/projects/rna_seq_workflow/resources/20240716_FOXY_info.tsv
+sample_info: /home/marc/projects/rna_seq_workflow/resources/wesdi_denovo_info.tsv
 
 #Contrast .csv file containing a "treatment" column and a "control" column specifying what conditions should be contrasted. 
-contrast :  /home/marc/projects/rna_seq_workflow/resources/foxy_contrast.tsv
+contrast :  /home/marc/projects/rna_seq_workflow/resources/wesdi_contrast.csv
 
 #Absoulte path to the reference amino acid sequences
-protein_fasta: /home/marc/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/protein.faa
+protein_fasta: /home/marc/projects/genome_annotation/workflow/results/braker/westerdykella_dispersa/braker.aa
 
 #EGGNOG-MAPPER V2 results (Optional)
-eggnog_results: /home/marc/projects/rna_seq_workflow/results/functional_annotations/eggnog/MM_73ak8la3.emapper.annotations.tsv
+eggnog_results: /home/marc/projects/rna_seq_workflow/results/functional_annotations/wesdi_denovo/eggnog/MM_t865abr3.emapper.annotations.tsv
 
 
 #PARAMETERS

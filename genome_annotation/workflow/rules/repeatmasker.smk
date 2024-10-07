@@ -3,10 +3,10 @@ rule repeatmasker:
         genome_assembly = config["genome_assembly"],
 
     output:
-        masked_genome = config["work_dir"]+"/workflow/results/repeatmasker/{run_id}/{run_id}.fasta.masked",
+        masked_genome = "results/repeatmasker/{run_id}/{run_id}.fasta.masked",
 
     params:
-        out_dir = directory(config["work_dir"]+"/workflow/results/repeatmasker/{run_id}"),
+        out_dir = directory("results/repeatmasker/{run_id}"),
         reference_taxon = config["DFAM taxon"]
 
     threads:

@@ -1,15 +1,22 @@
+import os
+import glob
 from snakemake.utils import min_version
 min_version("8.11.3")
 
-configfile: "/home/marc/projects/genome_annotation/config/config.yaml"
+configfile: "../config/config.yaml"
 
 samples = glob_wildcards(config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz")
+
+def get_final_output():
+    final_output = expand(
+        "results/braker/{run_id}/braker.gtf", run_id = config["Run ID"]
+    )
+    return final_output
 
 rule all:
     input:
         get_final_output()
 
-include:    "functions.smk"
 include:    "rules/repeatmasker.smk"
 include:    "rules/BRAKER3.smk"
 

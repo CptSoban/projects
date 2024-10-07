@@ -1,7 +1,5 @@
 #INPUT
 
-work_dir: /home/marc/projects/genome_annotation
-
 genome_assembly: /home/marc/projects/genome_annotation/resources/genome_assembly/fusarium_oxysporum/ncbi_dataset/data/GCF_013085055.1/GCF_013085055.1_ASM1308505v1_genomic.fna
 
 rna_reads_directory : /home/marc/projects/rna_seq_workflow/resources/rna_seq_foxy/reads
@@ -10,7 +8,8 @@ Run ID: fusarium_oxysporum
 
 DFAM taxon: eukaryota
 
-Fungi: 
+# Causes bug in BRAKER
+#Fungi: 
 
 #PARAMETERS
 
