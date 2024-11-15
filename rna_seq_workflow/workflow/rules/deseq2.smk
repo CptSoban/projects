@@ -20,10 +20,7 @@ rule deseq2_contrast:
         deseq_dataset = "results/DEG_analysis/{run_id}/{run_id}_dds.rds",
         contrast = config["contrast"],
     output:
-        mod_deg_table = "results/DEG_analysis/{run_id}/{run_id}_{contrast}.csv",
-
-    params:
-        run_id = "{run_id}"
+        mod_deg_table = "results/DEG_analysis/{run_id}/deg_{contrast}.csv",
 
     conda:
         "../envs/deg_analysis.yaml"

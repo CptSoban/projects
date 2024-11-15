@@ -1,7 +1,8 @@
+#!/usr/bin/python
+import os
 import pandas as pd
-import numpy as np
 
-annotated_results = pd.read_csv(snakemake.input["annotated_results"])
+annotated_results = pd.read_csv()
 
 eggnog_results = pd.read_csv(snakemake.input["eggnog_results"], 
                             sep="\t",
@@ -35,3 +36,10 @@ annotated_results = annotated_results.join(eggnog_results)
 annotated_results = annotated_results.sort_values(by=["log2FoldChange","padj"], ascending=False)
 
 annotated_results.to_csv(snakemake.output["combined_annotations"])
+
+# Try to delete the interpro file.
+try:
+    os.remove(snakemake.input["annotated_results"])
+except OSError as e:
+    # If it fails, inform the user.
+    print("Error: %s - %s." % (e.filename, e.strerror))

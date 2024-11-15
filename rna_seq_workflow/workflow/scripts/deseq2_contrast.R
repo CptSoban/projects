@@ -27,12 +27,5 @@ for (pair in seq_len(nrow(contrast_info))) {
     contrast_res <- contrast_conditions(pair_vector[1], pair_vector[2])
 
     # Write results to CSV file
-    write.csv(contrast_res, gsub(" ", "",
-                            paste("results/DEG_analysis/",
-                                    snakemake@params[["run_id"]],
-                                    "/",
-                                    snakemake@params[["run_id"]],
-                                    "_",
-                                    conc_pairs,
-                                    ".csv")))
+    write.csv(contrast_res, snakemake@output[["mod_deg_table"]])
 }

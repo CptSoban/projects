@@ -1,10 +1,10 @@
 rule eggnog_annotations:
     input:
-        annotated_results = "results/functional_annotations/interproscan/{run_id}/{contrast}/{run_id}_{contrast}_interpro_annotations.csv",
+        annotated_results = "results/functional_annotations/interproscan/{run_id}/{contrast}_interpro_annotations.csv",
         eggnog_results = config["eggnog_results"],
 
     output:
-        combined_annotations = "results/functional_annotations/{run_id}/{contrast}/{run_id}_combined_annotations.csv"
+        combined_annotations = "results/functional_annotations/{run_id}/{contrast}_combined_annotations.csv"
 
     threads:
         config["threads"]

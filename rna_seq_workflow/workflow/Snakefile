@@ -14,29 +14,31 @@ def contrast_conditions(config_contrast):
     return contrast_list
 
 CONTRAST = contrast_conditions(config["contrast"])
+RUN_ID = config["run id"]
 
 wildcard_constraints:
-    contrast=".*_vs_.*"
+    contrast = ".*_vs_.*",
+    run_id = config["run id"]
 
 def get_final_output():
     final_output = expand("results/fastqc/{run_id}/{sample}_{group}_fastqc.{ext}", 
-    run_id=config["Run ID"], sample=set(SAMPLES.sample), group=set(SAMPLES.group), ext=["html","zip"]
+    run_id=RUN_ID, sample=set(SAMPLES.sample), group=set(SAMPLES.group), ext=["html","zip"]
     )
-    # final_output.append(expand("results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam", run_id=config["Run ID"], sample=set(SAMPLES.sample)))
-    # final_output.append(expand("results/feature_counts/{run_id}/{run_id}_counts.txt", run_id=config["Run ID"]))
-    # final_output.append(expand("results/feature_counts/{run_id}/mod_{run_id}_counts.csv", run_id=config["Run ID"]))
-    final_output.append(expand("results/DEG_analysis/{run_id}/{run_id}_dds.rds", run_id=config["Run ID"]))
-    final_output.append(expand("results/DEG_analysis/{run_id}/{run_id}_{contrast}.csv", run_id=config["Run ID"], contrast=CONTRAST))
-    final_output.append(expand("results/DEG_analysis/{run_id}/plots/{run_id}_heatmap.pdf", run_id=config["Run ID"]))
-    final_output.append(expand("results/DEG_analysis/{run_id}/plots/{run_id}_{contrast}_volcano.pdf", run_id=config["Run ID"], contrast=CONTRAST))
-    final_output.append(expand("resources/{run_id}_gtf_db", run_id=config["Run ID"]))
-    final_output.append(expand("results/DEG_analysis/{run_id}/{contrast}/main_{run_id}_{contrast}.csv", run_id=config["Run ID"], contrast=CONTRAST))
-    final_output.append(expand("results/DEG_analysis/{run_id}/{contrast}/{run_id}_{contrast}.aa", run_id=config["Run ID"], contrast=CONTRAST))
-    final_output.append(expand("results/functional_annotations/{run_id}/interproscan/{run_id}_{contrast}.gff3", run_id=config["Run ID"], contrast=CONTRAST))
-    final_output.append(expand("resources/{run_id}/{run_id}_{contrast}_interpro_results_db", run_id=config["Run ID"], contrast=CONTRAST))
-    final_output.append(expand("results/functional_annotations/interproscan/{run_id}/{contrast}/{run_id}_{contrast}_interpro_annotations.csv", run_id=config["Run ID"], contrast=CONTRAST))
+    final_output.append(expand("results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam", run_id=RUN_ID, sample=set(SAMPLES.sample)))
+    final_output.append(expand("results/feature_counts/{run_id}/{run_id}_counts.txt", run_id=RUN_ID))
+    final_output.append(expand("results/feature_counts/{run_id}/mod_{run_id}_counts.csv", run_id=RUN_ID))
+    final_output.append(expand("results/DEG_analysis/{run_id}/{run_id}_dds.rds", run_id=RUN_ID))
+    final_output.append(expand("results/DEG_analysis/{run_id}/deg_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST))
+    final_output.append(expand("results/DEG_analysis/{run_id}/plots/heatmap.pdf", run_id=RUN_ID))
+    final_output.append(expand("results/DEG_analysis/{run_id}/plots/{contrast}_volcano.pdf", run_id=RUN_ID, contrast=CONTRAST))
+    final_output.append(expand("resources/{run_id}_gtf_db", run_id=RUN_ID))
+    final_output.append(expand("results/DEG_analysis/{run_id}/{contrast}/trim_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST))
+    final_output.append(expand("results/DEG_analysis/{run_id}/{contrast}/{contrast}.aa", run_id=RUN_ID, contrast=CONTRAST))
+    final_output.append(expand("results/functional_annotations/{run_id}/interproscan/{contrast}.gff3", run_id=RUN_ID, contrast=CONTRAST))
+    final_output.append(expand("resources/{run_id}/{contrast}_interpro_results_db", run_id=RUN_ID, contrast=CONTRAST))
+    final_output.append(expand("results/functional_annotations/interproscan/{run_id}/{contrast}/{contrast}_interpro_annotations.csv", run_id=RUN_ID, contrast=CONTRAST))
     if config["eggnog_results"]:
-        final_output.append(expand("results/functional_annotations/{run_id}/{contrast}/{run_id}_combined_annotations.csv", run_id=config["Run ID"], contrast=CONTRAST))
+        final_output.append(expand("results/functional_annotations/{run_id}/{contrast}/{contrast}_combined_annotations.csv", run_id=RUN_ID, contrast=CONTRAST))
     return final_output
 
 rule all:
@@ -45,13 +47,9 @@ rule all:
 
 
 include:    "rules/fastqc.smk"
-
-if config["Trimming"] == "yes":
-    include:    "rules/cutadapt.smk"
-
-# include:    "rules/hisat2_index.smk"
-# include:    "rules/hisat2_align.smk"
-# include:    "rules/featureCounts.smk"
+include:    "rules/hisat2_index.smk"
+include:    "rules/hisat2_align.smk"
+include:    "rules/featureCounts.smk"
 include:    "rules/deseq2_prep.smk"
 include:    "rules/deseq2.smk"
 include:    "rules/volcano.smk"

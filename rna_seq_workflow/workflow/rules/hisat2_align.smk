@@ -1,7 +1,7 @@
 rule hisat2_align:
     input:
-        r1 = "results/cutadapt/{run_id}/trim_{sample}_R1.fastq.gz" if config["Trimming"] == "yes" else config["seq_dir"]+"/{sample}_R1.fastq.gz",
-        r2 = "results/cutadapt/{run_id}/trim_{sample}_R2.fastq.gz" if config["Trimming"] == "yes" else config["seq_dir"]+"/{sample}_R2.fastq.gz",
+        r1 = config["seq_dir"]+"/{sample}_R1.fastq.gz",
+        r2 = config["seq_dir"]+"/{sample}_R2.fastq.gz",
         index_files = "results/hisat2_index/{run_id}/{run_id}.1.ht2"
     output:
         bam_file = "results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam"

@@ -1,7 +1,7 @@
 rule featureCounts:
     input:
         gtf = config["gtf"],
-        bam_files = expand("results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam", run_id=config["Run ID"], sample=set(SAMPLES.sample))
+        bam_files = expand("results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam", run_id=RUN_ID, sample=set(SAMPLES.sample))
     
     output:
         counts_table = "results/feature_counts/{run_id}/{run_id}_counts.txt",

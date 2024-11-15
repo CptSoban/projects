@@ -45,7 +45,7 @@ def get_latest_interpro_data():
         
         # Execute the curl command to download the file  
         curl_command = f"curl -O --output-dir resources/ {download_url}"
-        tar_command = f"tar -pxzf {tarball_path}"
+        tar_command = f"tar -pxzf {tarball_path} -C resources/"
         pull_command = f"apptainer pull --dir rna_seq_workflow/resources docker://interpro/interproscan:latest"
         os.system(curl_command)
         os.system(tar_command)
@@ -57,9 +57,9 @@ def get_latest_interpro_data():
 #indicating the end of the specific sequences. These can be removed without concern, which is necessary for Interproscan.
 rule filter_sequences_with_asterisk:
     input:
-        all_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/{run_id}_{contrast}.aa",
+        all_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/{contrast}.aa",
     output:
-        cleaned_aa = "results/functional_annotations/{run_id}/{run_id}_{contrast}_clean.aa",
+        cleaned_aa = "results/functional_annotations/{run_id}/{contrast}/{contrast}_clean.aa",
     run:
         def filter_sequences_with_asterisk(input_file, output_file):
             with open(input_file, "r") as input_handle, open(output_file, "w") as output_handle:
@@ -77,14 +77,14 @@ rule filter_sequences_with_asterisk:
 
 rule interproscan_run:
     input:
-        cleaned_aa = "results/functional_annotations/{run_id}/{run_id}_{contrast}_clean.aa",
+        cleaned_aa = "results/functional_annotations/{run_id}/{contrast}/{contrast}_clean.aa",
         interpro_data = get_latest_interpro_data()
 
     output:
-        interpro_gff = "results/functional_annotations/{run_id}/interproscan/{run_id}_{contrast}.gff3",
+        interpro_gff = "results/functional_annotations/{run_id}/interproscan/{contrast}.gff3",
 
     params:
-        interpro_output = "results/functional_annotations/{run_id}/interproscan/{run_id}_{contrast}",
+        interpro_output = "results/functional_annotations/{run_id}/interproscan/{contrast}",
         go_terms = "-goterms" if config["GO_terms"] == "yes" else "",
 
     threads:
@@ -101,10 +101,10 @@ rule interproscan_run:
 
 rule interpro_db:
     input:
-        interpro_gff = "results/functional_annotations/{run_id}/interproscan/{run_id}_{contrast}.gff3",
+        interpro_gff = "results/functional_annotations/{run_id}/interproscan/{contrast}.gff3",
 
     output:
-        interpro_results_db = "resources/{run_id}/{run_id}_{contrast}_interpro_results_db",
+        interpro_results_db = "resources/{run_id}/{contrast}_interpro_results_db",
     
     conda:
         "../envs/gffutils_db.yaml"

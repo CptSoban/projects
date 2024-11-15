@@ -2,5 +2,4 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
- - python=3.10.6
- - star=2.7.10b
+- bioconductor-clusterprofiler=4.10.0
