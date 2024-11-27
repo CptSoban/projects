@@ -80,8 +80,8 @@ ids_to_extract = [item for sublist in list(protein_dict.values()) for item in su
 records = list(SeqIO.parse(snakemake.input["ref_protein_fasta"], "fasta"))
 
 #Write selected sequences to a new fasta file
-with open(snakemake.output["all_protein_sequences"], "w") as output_all:
-    SeqIO.write((record for record in records if record.id in ids_to_extract), output_all, "fasta")
+# with open(snakemake.output["all_protein_sequences"], "w") as output_all:
+#     SeqIO.write((record for record in records if record.id in ids_to_extract), output_all, "fasta")
 
 
 #Joining protein_ids with main DEGs dataframe
@@ -100,10 +100,10 @@ positive_DEG_df = positive_DEG_df[filter_mask_padj]
 
 positive_DEG_df.to_csv(snakemake.output["positive_DEGs"])
 
-top_500 = positive_DEG_df["protein_ids"].head(500).tolist()
+# top_500 = positive_DEG_df["protein_ids"].head(500).tolist()
 
-with open(snakemake.output["pos_protein_sequences"], "w") as output_pos:
-    SeqIO.write((record for record in records if record.id in top_500), output_pos, "fasta")
+# with open(snakemake.output["pos_protein_sequences"], "w") as output_pos:
+#     SeqIO.write((record for record in records if record.id in top_500), output_pos, "fasta")
 
 
 #Table containing negative DEGs
@@ -117,7 +117,7 @@ negative_DEG_df = negative_DEG_df[filter_mask_padj]
 
 negative_DEG_df.to_csv(snakemake.output["negative_DEGs"])
 
-bottom_500 = negative_DEG_df["protein_ids"].tail(500).tolist()
+# bottom_500 = negative_DEG_df["protein_ids"].tail(500).tolist()
 
-with open(snakemake.output["neg_protein_sequences"], "w") as output_neg:
-    SeqIO.write((record for record in records if record.id in bottom_500), output_neg, "fasta")
+# with open(snakemake.output["neg_protein_sequences"], "w") as output_neg:
+#     SeqIO.write((record for record in records if record.id in bottom_500), output_neg, "fasta")
