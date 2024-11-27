@@ -15,4 +15,4 @@ rule repeatmasker:
     conda:
         "../envs/repeatmasker.yaml"
 
-    shell: """RepeatMasker -species {params.reference_taxon} -dir {params.out_dir} -gff -e ncbi -s {input.genome_assembly}""" 
+    shell: """RepeatMasker -species {params.reference_taxon} -dir {params.out_dir} -gff -xsmall -e ncbi -s {input.genome_assembly}""" 

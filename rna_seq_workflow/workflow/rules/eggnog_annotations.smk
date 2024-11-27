@@ -6,9 +6,6 @@ rule eggnog_annotations:
     output:
         combined_annotations = "results/functional_annotations/{run_id}/{contrast}_combined_annotations.csv"
 
-    threads:
-        config["threads"]
-
     conda:
         "../envs/annotation_integration.yaml"
 

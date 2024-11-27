@@ -12,6 +12,7 @@ rule deseq2:
 
     conda:
         "../envs/deg_analysis.yaml"
+        
     script:
         "../scripts/deseq2.R"
 
@@ -19,10 +20,12 @@ rule deseq2_contrast:
     input:
         deseq_dataset = "results/DEG_analysis/{run_id}/{run_id}_dds.rds",
         contrast = config["contrast"],
+
     output:
         mod_deg_table = "results/DEG_analysis/{run_id}/deg_{contrast}.csv",
 
     conda:
         "../envs/deg_analysis.yaml"
+
     script:
         "../scripts/deseq2_contrast.R"

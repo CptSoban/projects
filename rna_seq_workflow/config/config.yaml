@@ -5,34 +5,31 @@
 #INPUT
 
 #Absolute path to your RNAseq reads directory. sample names should have the following format: ID_GROUP.fastq
-seq_dir: /home/marc/projects/rna_seq_workflow/resources/rna_seq_foxy/reads
+seq_dir: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/reads
 
 #Absolute path to the reference genome fasta
-ref_genome: /home/marc/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/GCF_000149955.1_ASM14995v2_genomic.fna
+ref_genome: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/GCF_000149955.1_ASM14995v2_genomic.fna
 
 #The ID for this analyis run
 run id: 20240716_FOXY
 
 #Absolute path to the genome annotation file (GTF) 
-gtf: /home/marc/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/genomic.gtf
+gtf: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/genomic.gtf
 
 #Sample info file 
-sample_info: /home/marc/projects/rna_seq_workflow/resources/20240716_FOXY_info.tsv
+sample_info: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/20240716_FOXY_info.tsv
 
 #Contrast .csv file containing a "treatment" column and a "control" column specifying what conditions should be contrasted. 
-contrast :  /home/marc/projects/rna_seq_workflow/resources/foxy_contrast.csv
+contrast :  /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/foxy_contrast.csv
 
 #Absoulte path to the reference amino acid sequences
-protein_fasta: /home/marc/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/protein.faa
+protein_fasta: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/protein.faa
 
 #EGGNOG-MAPPER V2 results (Optional)
-eggnog_results: /home/marc/projects/rna_seq_workflow/results/functional_annotations/new_FOXG_ASM14995v2/eggnog/MM_0t_4hjca.emapper.annotations.tsv
+eggnog_results: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/MM_0t_4hjca.emapper.annotations.tsv
 
 
 #PARAMETERS
-
-#Computational ressources
-threads:  4
 
 #Strandness ["",0] for Unstranded, ["FR",1] for Stranded or ["RF",2] for Reverse Stranded
 Strandness: ["RF",2]

@@ -1,3 +1,4 @@
+
 from Bio import SeqIO
 import requests
 import re
@@ -78,7 +79,6 @@ rule filter_sequences_with_asterisk:
         cleaned_aa = "results/functional_annotations/{run_id}/cleaned.aa", #"results/functional_annotations/{run_id}/{contrast}/{contrast}_clean.aa",
     run:
         filter_sequences_with_asterisk(input[0], output[0])
-        
 
 rule pull_interpro_sif:
     output:
@@ -90,17 +90,15 @@ rule pull_interpro_sif:
 rule interproscan_run:
     input:
         cleaned_aa = "results/functional_annotations/{run_id}/cleaned.aa", #"results/functional_annotations/{run_id}/{contrast}/{contrast}_clean.aa",
-        interpro_data = latest_interpro_data
+        interpro_data = latest_interpro_data,
+        container_file = "resources/interproscan_latest.sif"
 
     output:
-        interpro_gff = "results/functional_annotations/{run_id}/interproscan/{contrast}.gff3",
+        interpro_gff = "results/functional_annotations/{run_id}/interproscan/{run_id}.gff3",
 
     params:
-        interpro_output = "results/functional_annotations/{run_id}/interproscan/{contrast}",
+        interpro_output = "results/functional_annotations/{run_id}/interproscan/{run_id}",
         go_terms = "-goterms" if config["GO_terms"] == "yes" else "",
-
-    threads:
-        config["threads"]
 
     shell:  """ apptainer exec \
             -B {input.interpro_data}:/opt/interproscan/data/ \
@@ -113,10 +111,10 @@ rule interproscan_run:
 
 rule interpro_db:
     input:
-        interpro_gff = "results/functional_annotations/{run_id}/interproscan/{contrast}.gff3",
+        interpro_gff = "results/functional_annotations/{run_id}/interproscan/{run_id}.gff3",
 
     output:
-        interpro_results_db = "resources/{run_id}/{contrast}_interpro_results_db",
+        interpro_results_db = "resources/{run_id}/interpro_results_db",
     
     conda:
         "../envs/gffutils_db.yaml"

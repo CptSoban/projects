@@ -33,12 +33,12 @@ def get_final_output():
     final_output.append(expand("results/DEG_analysis/{run_id}/plots/{contrast}_volcano.pdf", run_id=RUN_ID, contrast=CONTRAST))
     final_output.append(expand("resources/{run_id}_gtf_db", run_id=RUN_ID))
     final_output.append(expand("results/DEG_analysis/{run_id}/{contrast}/trim_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST))
-    final_output.append(expand("results/DEG_analysis/{run_id}/{contrast}/{contrast}.aa", run_id=RUN_ID, contrast=CONTRAST))
-    final_output.append(expand("results/functional_annotations/{run_id}/interproscan/{contrast}.gff3", run_id=RUN_ID, contrast=CONTRAST))
-    final_output.append(expand("resources/{run_id}/{contrast}_interpro_results_db", run_id=RUN_ID, contrast=CONTRAST))
-    final_output.append(expand("results/functional_annotations/interproscan/{run_id}/{contrast}/{contrast}_interpro_annotations.csv", run_id=RUN_ID, contrast=CONTRAST))
+    # final_output.append(expand("results/DEG_analysis/{run_id}/{contrast}/{contrast}.aa", run_id=RUN_ID, contrast=CONTRAST))
+    final_output.append(expand("results/functional_annotations/{run_id}/interproscan/{run_id}.gff3", run_id=RUN_ID))
+    final_output.append(expand("resources/{run_id}/interpro_results_db", run_id=RUN_ID))
+    final_output.append(expand("results/functional_annotations/interproscan/{run_id}/{contrast}_interpro_annotations.csv", run_id=RUN_ID, contrast=CONTRAST))
     if config["eggnog_results"]:
-        final_output.append(expand("results/functional_annotations/{run_id}/{contrast}/{contrast}_combined_annotations.csv", run_id=RUN_ID, contrast=CONTRAST))
+        final_output.append(expand("results/functional_annotations/{run_id}/{contrast}_combined_annotations.csv", run_id=RUN_ID, contrast=CONTRAST))
     return final_output
 
 rule all:
@@ -55,7 +55,7 @@ include:    "rules/deseq2.smk"
 include:    "rules/volcano.smk"
 include:    "rules/heatmap.smk"
 include:    "rules/gtf_db.smk"
-include:    "rules/protein_seq_extract.smk"
+# include:    "rules/protein_seq_extract.smk"
 include:    "rules/interproscan.smk"
 include:    "rules/interpro_annotations.smk"
 

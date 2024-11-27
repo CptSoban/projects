@@ -1,0 +1,58 @@
+from snakemake.utils import min_version
+min_version("7.25")
+from pathlib import Path
+
+configfile: "config/config.yaml"
+
+samples = glob_wildcards(config["seq_dir"]+"/{sample}_{group}.fastq")
+
+rule all:
+    input:
+        expand("{workflow_dir}/results/fastqc/{run_id}/{sample}_{group}_fastqc.{ext}", workflow_dir=config["workflow_dir"], run_id=config["Run ID"], sample=set(samples.sample), group=["R1","R2"], ext=["html","zip"]),
+        expand("{workflow_dir}/results/hisat2_index/{run_id}/{run_id}.1.ht2", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/{aligner}_align/{run_id}/{sample}.sortedByCoord.out.bam", workflow_dir=config["workflow_dir"], sample=set(samples.sample), run_id=config["Run ID"], aligner=config["Aligner"]),
+        expand("{workflow_dir}/results/feature_counts/{run_id}/{run_id}_counts.txt", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/DEG_analysis/{run_id}/{run_id}_deseq2_results.csv", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/DEG_analysis/{run_id}/{run_id}_mod_deseq2_results.csv", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/DEG_analysis/{run_id}/{run_id}_normalized_counts.csv", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/DEG_analysis/{run_id}/plots/{run_id}_dispersion_plot.pdf", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/DEG_analysis/{run_id}/plots/{run_id}_pca_plot.svg", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/DEG_analysis/{run_id}/plots/{run_id}_heatmap.pdf", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/DEG_analysis/{run_id}/plots/{run_id}_volcano_plot.pdf", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        # expand("{workflow_dir}/results/feature_counts/{run_id}/{run_id}_product_annotation.csv", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/resources/{run_id}_gtf_db", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/DEG_analysis/{run_id}/{run_id}_main_results.csv", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/DEG_analysis/{run_id}/{run_id}_protein.fasta", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/functional_annotations/{run_id}/interproscan/{run_id}.gff3", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/resources/{run_id}_interpro_results_db", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/functional_annotations/{run_id}/interproscan/{run_id}_interpro_annotations.csv", workflow_dir=config["workflow_dir"], run_id=config["Run ID"]),
+        expand("{workflow_dir}/results/functional_annotations/{run_id}/{run_id}_combined_annotations.csv", workflow_dir=config["workflow_dir"], run_id=config["Run ID"])
+        # expand("results/GSEA/{run_id}_gsea_table.csv", run_id=config["Run ID"]),
+        # expand("results/GSEA/{run_id}_gsea_{gene_set}.csv", run_id=config["Run ID"], gene_set=config["GSEA gene set"]),
+        
+include:    "rules/fastqc.smk"
+
+if config["Trimming"] == "yes":
+    include:    "rules/cutadapt.smk"
+
+include:    "rules/hisat2_index.smk"
+include:    "rules/hisat2_align.smk"
+include:    "rules/featureCounts.smk"
+include:    "rules/deseq2_prep.smk"
+include:    "rules/deseq2.smk"
+include:    "rules/volcano.smk"
+include:    "rules/heatmap.smk"
+include:    "rules/gtf_db.smk"
+include:    "rules/protein_seq_extract.smk"
+include:    "rules/interproscan.smk"
+include:    "rules/interproscan_db.smk"
+include:    "rules/interpro_annotations.smk"
+
+if Path(config["eggnog_results"]).suffix == ".tsv":
+    include: "rules/eggnog_annotations.smk"
+#include:    "rules/gsea_prep.smk"
+#include:    "rules/g_profiler.smk"
+#include:    "rules/wgcna.smk"
+
+
+

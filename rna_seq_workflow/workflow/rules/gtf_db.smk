@@ -4,8 +4,6 @@ rule gtf_db:
 
     output:
         gtf_database = "resources/{run_id}_gtf_db",
-
-    threads: config["threads"]
     
     conda:
         "../envs/gffutils_db.yaml"
