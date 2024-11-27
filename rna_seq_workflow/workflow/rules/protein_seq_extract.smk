@@ -8,9 +8,9 @@ rule protein_seq_extract:
         main_results = "results/DEG_analysis/{run_id}/{contrast}/trim_{contrast}.csv",
         positive_DEGs = "results/DEG_analysis/{run_id}/{contrast}/pos_{contrast}.csv",
         negative_DEGs = "results/DEG_analysis/{run_id}/{contrast}/neg_{contrast}.csv",
-        all_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/{contrast}.aa",
-        pos_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/pos_{contrast}.aa",
-        neg_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/neg_{contrast}.aa",
+        # all_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/{contrast}.aa",
+        # pos_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/pos_{contrast}.aa",
+        # neg_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/neg_{contrast}.aa",
 
     conda:
         "../envs/protein_seq_extract.yaml"
