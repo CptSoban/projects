@@ -13,8 +13,6 @@ rule hisat2_align:
     params:
         basename = "results/hisat2_index/{run_id}/{run_id}",
         strandness = config["Strandness"][0]
-    threads:
-        config["threads"]
 
     conda:
         "../envs/hisat2.yaml"

@@ -9,9 +9,6 @@ rule fastqc:
     params:
         out_dir = "results/fastqc/{run_id}",
     
-    threads:
-        config["threads"]
-    
     conda:  "../envs/fastqc.yaml"
 
     shell:  """mkdir -p \

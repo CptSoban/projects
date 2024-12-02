@@ -12,6 +12,7 @@ rule deseq2:
 
     conda:
         "../envs/deg_analysis.yaml"
+        
     script:
         "../scripts/deseq2.R"
 
@@ -27,5 +28,6 @@ rule deseq2_contrast:
 
     conda:
         "../envs/deg_analysis.yaml"
+
     script:
         "../scripts/deseq2_contrast.R"

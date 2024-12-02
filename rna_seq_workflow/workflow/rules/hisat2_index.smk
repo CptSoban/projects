@@ -10,9 +10,6 @@ rule hisat2_index:
         index_dir = directory("results/hisat2_index/{run_id}"),
         basename = "results/hisat2_index/{run_id}/{run_id}",
 
-    threads:
-        config["threads"]
-
     conda:
         "../envs/hisat2.yaml"
 
