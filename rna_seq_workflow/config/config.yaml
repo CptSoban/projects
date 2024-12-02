@@ -37,4 +37,4 @@ threads:  4
 #Strandness ["",0] for Unstranded, ["FR",1] for Stranded or ["RF",2] for Reverse Stranded
 Strandness: ["RF",2]
 
-GO_terms: yes
+GO_terms: "yes"

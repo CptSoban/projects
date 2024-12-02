@@ -18,9 +18,12 @@ rule deseq2:
 rule deseq2_contrast:
     input:
         deseq_dataset = "results/DEG_analysis/{run_id}/{run_id}_dds.rds",
-        contrast = config["contrast"],
+
     output:
         mod_deg_table = "results/DEG_analysis/{run_id}/deg_{contrast}.csv",
+
+    params:
+        contrast_pair = lambda wildcards: wildcards.contrast.split("_vs_"),
 
     conda:
         "../envs/deg_analysis.yaml"
