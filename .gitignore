@@ -73,3 +73,10 @@ metagenome_assembly/resources
 metagenome_assembly/results
 simona
 rna_seq_workflow/config/config.yaml
+apilai.contigs.fasta
+genome_assembly/results/fusarium_oxysporum/README.md
+genome_assembly/results/fusarium_oxysporum/ncbi_dataset/data/assembly_data_report.jsonl
+genome_assembly/results/fusarium_oxysporum/ncbi_dataset/data/data_summary.tsv
+genome_assembly/results/fusarium_oxysporum/ncbi_dataset/data/dataset_catalog.json
+genome_assembly/results/fusarium_oxysporum/ncbi_dataset/data/GCF_013085055.1/GCF_013085055.1_ASM1308505v1_genomic.fna
+genome_assembly/results/wesdi_denovo/westerdykella_dispersa.fasta
