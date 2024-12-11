@@ -80,3 +80,5 @@ genome_assembly/results/fusarium_oxysporum/ncbi_dataset/data/data_summary.tsv
 genome_assembly/results/fusarium_oxysporum/ncbi_dataset/data/dataset_catalog.json
 genome_assembly/results/fusarium_oxysporum/ncbi_dataset/data/GCF_013085055.1/GCF_013085055.1_ASM1308505v1_genomic.fna
 genome_assembly/results/wesdi_denovo/westerdykella_dispersa.fasta
+/home/nanopore/projects/genome_annotation/results
+/home/nanopore/projects/comparative_genomics
