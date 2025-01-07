@@ -1,16 +1,20 @@
 #INPUT
 
-genome_assembly: /home/marc/projects/genome_annotation/resources/genome_assembly/fusarium_oxysporum/ncbi_dataset/data/GCF_013085055.1/GCF_013085055.1_ASM1308505v1_genomic.fna
+genome_assembly: /home/nanopore/projects/simona/cloro_assembly/flye_assembly/clonostachys_rosea.fasta
 
-rna_reads_directory : /home/marc/projects/rna_seq_workflow/resources/rna_seq_foxy/reads
+rna_reads_directory : 
+#or
+SRA_accession: SRR26555584
 
-Run ID: fusarium_oxysporum
+Run ID: clonostachys_rosea
 
-DFAM taxon: eukaryota
+DFAM taxon: fungi
 
-# Causes bug in BRAKER
-#Fungi: 
+eggnog_results: /home/nanopore/projects/genome_annotation/resources/clonostachys_rosea/MM_b_dstdr_.emapper.annotations.tsv
 
-#PARAMETERS
+GO_terms: "yes"
 
-Threads: 4
+threads: 8 
+
+# Causes bug in BRAKER!
+Fungi: 

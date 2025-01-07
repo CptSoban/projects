@@ -3,14 +3,21 @@ import glob
 from snakemake.utils import min_version
 min_version("8.11.3")
 
-configfile: "../config/config.yaml"
+configfile: "config/config.yaml"
 
-samples = glob_wildcards(config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz")
+RUN_ID = config["Run ID"]
 
 def get_final_output():
     final_output = expand(
-        "results/braker/{run_id}/braker.gtf", run_id = config["Run ID"]
+        "results/braker/{run_id}/braker.gtf", run_id=RUN_ID
     )
+    final_output.append(expand("results/braker/{run_id}/braker.aa", run_id=RUN_ID))
+    final_output.append(expand("resources/{run_id}_gtf_db", run_id=RUN_ID))
+    final_output.append(expand("results/functional_annotations/{run_id}/interproscan/{run_id}.gff3", run_id=RUN_ID))
+    final_output.append(expand("resources/{run_id}/interpro_results_db", run_id=RUN_ID))
+    final_output.append(expand("results/functional_annotations/interproscan/{run_id}/interpro_annotations.csv", run_id=RUN_ID))
+    if config["eggnog_results"]:
+        final_output.append(expand("results/functional_annotations/{run_id}/combined_annotations.csv", run_id=RUN_ID))
     return final_output
 
 rule all:
@@ -18,7 +25,18 @@ rule all:
         get_final_output()
 
 include:    "rules/repeatmasker.smk"
-include:    "rules/BRAKER3.smk"
+
+if config["rna_reads_directory"]:
+    include:    "rules/BRAKER3.smk"
+elif config["SRA_accession"]:
+    include:    "rules/BRAKER3_SRA.smk"
+
+include:    "rules/gtf_db.smk"
+include:    "rules/interproscan.smk"
+include:    "rules/interpro_annotations.smk"
+
+if config["eggnog_results"]:
+    include: "rules/eggnog_annotations.smk"
 
 
 
