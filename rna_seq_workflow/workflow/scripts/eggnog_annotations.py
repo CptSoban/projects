@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 
-annotated_results = pd.read_csv()
+annotated_results = pd.read_csv(snakemake.input["annotated_results"],)
 
 eggnog_results = pd.read_csv(snakemake.input["eggnog_results"], 
                             sep="\t",

@@ -1,14 +1,14 @@
 rule deseq2:
     input:
-        prep_counts_table = "results/feature_counts/{run_id}/mod_{run_id}_counts.csv",
+        prep_counts_table = "results/{run_id}/feature_counts/mod_{run_id}_counts.csv",
         sample_info = config["sample_info"]
         
 
     output:
-        deseq_dataset = "results/DEG_analysis/{run_id}/{run_id}_dds.rds",
-        normalized_counts = "results/DEG_analysis/{run_id}/{run_id}_normalized_counts.csv",
-        disp_plot = "results/DEG_analysis/{run_id}/plots/{run_id}_dispersion_plot.pdf",
-        pca_plot = "results/DEG_analysis/{run_id}/plots/{run_id}_pca_plot.svg",
+        deseq_dataset = "results/{run_id}/DEG_analysis/{run_id}_dds.rds",
+        normalized_counts = "results/{run_id}/DEG_analysis/{run_id}_normalized_counts.csv",
+        disp_plot = "results/{run_id}/DEG_analysis/plots/{run_id}_dispersion_plot.pdf",
+        pca_plot = "results/{run_id}/DEG_analysis/plots/{run_id}_pca_plot.svg",
 
     conda:
         "../envs/deg_analysis.yaml"
@@ -18,10 +18,10 @@ rule deseq2:
 
 rule deseq2_contrast:
     input:
-        deseq_dataset = "results/DEG_analysis/{run_id}/{run_id}_dds.rds",
+        deseq_dataset = "results/{run_id}/DEG_analysis/{run_id}_dds.rds",
 
     output:
-        mod_deg_table = "results/DEG_analysis/{run_id}/deg_{contrast}.csv",
+        mod_deg_table = "results/{run_id}/DEG_analysis/deg_{contrast}.csv",
 
     params:
         contrast_pair = lambda wildcards: wildcards.contrast.split("_vs_"),

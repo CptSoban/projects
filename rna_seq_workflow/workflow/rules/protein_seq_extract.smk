@@ -1,16 +1,13 @@
 rule protein_seq_extract:
     input:
-        mod_deg_table = "results/DEG_analysis/{run_id}/deg_{contrast}.csv",
+        mod_deg_table = "results/{run_id}/DEG_analysis/deg_{contrast}.csv",
         gtf_database = "resources/{run_id}_gtf_db",
         ref_protein_fasta = config["protein_fasta"],
 
     output:
-        main_results = "results/DEG_analysis/{run_id}/{contrast}/trim_{contrast}.csv",
-        positive_DEGs = "results/DEG_analysis/{run_id}/{contrast}/pos_{contrast}.csv",
-        negative_DEGs = "results/DEG_analysis/{run_id}/{contrast}/neg_{contrast}.csv",
-        # all_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/{contrast}.aa",
-        # pos_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/pos_{contrast}.aa",
-        # neg_protein_sequences = "results/DEG_analysis/{run_id}/{contrast}/neg_{contrast}.aa",
+        main_results = "results/{run_id}/DEG_analysis/{contrast}/trim_{contrast}.csv",
+        # positive_DEGs = "results/{run_id}/DEG_analysis/{contrast}/pos_{contrast}.csv",
+        # negative_DEGs = "results/{run_id}/DEG_analysis/{contrast}/neg_{contrast}.csv",
 
     conda:
         "../envs/protein_seq_extract.yaml"

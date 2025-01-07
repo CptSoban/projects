@@ -2,10 +2,12 @@
 #You have to modify this file to your needs and fill out every option (if not stated otherwise), 
 #but do not add or remove options if your not 100% sure what you are doing!
 
-#INPUT
+#INPUT (Mandatory)
 
 #Absolute path to your RNAseq reads directory. sample names should have the following format: ID_GROUP.fastq
 seq_dir: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/reads
+#Strandness of RNA-seq reads ["",0] for Unstranded, ["FR",1] for Stranded or ["RF",2] for Reverse Stranded
+Strandness: ["RF",2]
 
 #Absolute path to the reference genome fasta
 ref_genome: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/GCF_000149955.1_ASM14995v2_genomic.fna
@@ -25,13 +27,18 @@ contrast :  /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/foxy
 #Absoulte path to the reference amino acid sequences
 protein_fasta: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/genome/GCF_000149955.1/protein.faa
 
-#EGGNOG-MAPPER V2 results (Optional)
+
+#ADDITIONAL FEATURES (Optional)
+
+
+# Visualisation of DEG results (Volcano plot, PCA plot, Heatmap) ["yes",""]
+DEG_visualization: "yes"
+
+# Functional annotation of DEGs (InterProScan) ["yes",""]
+functional_annotation: "yes"
+GO_terms: "yes"
+#Additional functional annotation of DEGs (eggNOG-mapper) [Path to eggNOG-mapper results,""] (Optional)
 eggnog_results: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/MM_0t_4hjca.emapper.annotations.tsv
 
-
-#PARAMETERS
-
-#Strandness ["",0] for Unstranded, ["FR",1] for Stranded or ["RF",2] for Reverse Stranded
-Strandness: ["RF",2]
-
-GO_terms: "yes"
+#Pathway enrichment analysis of DEGs (Fishers exact test, GSEA) (KEGG) ["yes",""]
+enrichment_analysis: "yes"

@@ -3,11 +3,11 @@ rule fastqc:
         seq = config["seq_dir"]+"/{sample}_{group}.fastq.gz",
     
     output:
-        html = "results/fastqc/{run_id}/{sample}_{group}_fastqc.html",
-        zip_file = "results/fastqc/{run_id}/{sample}_{group}_fastqc.zip"
+        html = "results/{run_id}/fastqc/{sample}_{group}_fastqc.html",
+        zip_file = "results/{run_id}/fastqc/{sample}_{group}_fastqc.zip"
     
     params:
-        out_dir = "results/fastqc/{run_id}",
+        out_dir = "results/{run_id}/fastqc",
     
     conda:  "../envs/fastqc.yaml"
 

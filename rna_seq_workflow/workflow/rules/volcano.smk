@@ -1,9 +1,9 @@
 rule volcano:
     input:
-        mod_deg_table = "results/DEG_analysis/{run_id}/deg_{contrast}.csv",
+        mod_deg_table = "results/{run_id}/DEG_analysis/deg_{contrast}.csv",
 
     output:
-        volcano_plot = "results/DEG_analysis/{run_id}/plots/{contrast}_volcano.pdf",
+        volcano_plot = "results/{run_id}/DEG_analysis/plots/{contrast}_volcano.pdf",
 
     conda:
         "../envs/enhanced_volcano.yaml"

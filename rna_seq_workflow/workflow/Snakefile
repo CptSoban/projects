@@ -1,65 +1,109 @@
 from snakemake.utils import min_version
+# Check if the version of snakemake is at least 8.11.3
 min_version("8.11.3")
 from pathlib import Path
 import pandas as pd
 
+# Load the configuration file
 configfile: "config/config.yaml"
 
+# Define the samples
 SAMPLES = glob_wildcards(config["seq_dir"]+"/{sample}_{group}.fastq.gz")
 
+# Define the contrast conditions
 def contrast_conditions(config_contrast):
+    if not Path(config_contrast).exists():
+        raise FileNotFoundError(f"Contrast file '{config_contrast}' not found.")
     contrast_df = pd.read_csv(config_contrast)
-    contrast_list = contrast_df.values.tolist()
-    contrast_list = ["_vs_".join(pair) for pair in contrast_list]
+    if contrast_df.empty or contrast_df.shape[1] < 2:
+        raise ValueError("Contrast file is empty or has fewer than two columns.")
+    contrast_list = ["_vs_".join(pair) for pair in contrast_df.values.tolist()]
     return contrast_list
 
+# Define the variables
 CONTRAST = contrast_conditions(config["contrast"])
 RUN_ID = config["run id"]
 
+# Define the wildcard constraints
 wildcard_constraints:
     contrast = ".*_vs_.*",
     run_id = config["run id"]
 
+# Define the final output files
 def get_final_output():
-    final_output = expand("results/fastqc/{run_id}/{sample}_{group}_fastqc.{ext}", 
-    run_id=RUN_ID, sample=set(SAMPLES.sample), group=set(SAMPLES.group), ext=["html","zip"]
-    )
-    final_output.append(expand("results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam", run_id=RUN_ID, sample=set(SAMPLES.sample)))
-    final_output.append(expand("results/feature_counts/{run_id}/{run_id}_counts.txt", run_id=RUN_ID))
-    final_output.append(expand("results/feature_counts/{run_id}/mod_{run_id}_counts.csv", run_id=RUN_ID))
-    final_output.append(expand("results/DEG_analysis/{run_id}/{run_id}_dds.rds", run_id=RUN_ID))
-    final_output.append(expand("results/DEG_analysis/{run_id}/deg_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST))
-    final_output.append(expand("results/DEG_analysis/{run_id}/plots/heatmap.pdf", run_id=RUN_ID))
-    final_output.append(expand("results/DEG_analysis/{run_id}/plots/{contrast}_volcano.pdf", run_id=RUN_ID, contrast=CONTRAST))
-    final_output.append(expand("resources/{run_id}_gtf_db", run_id=RUN_ID))
-    final_output.append(expand("results/DEG_analysis/{run_id}/{contrast}/trim_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST))
-    # final_output.append(expand("results/DEG_analysis/{run_id}/{contrast}/{contrast}.aa", run_id=RUN_ID, contrast=CONTRAST))
-    final_output.append(expand("results/functional_annotations/{run_id}/interproscan/{run_id}.gff3", run_id=RUN_ID))
-    final_output.append(expand("resources/{run_id}/interpro_results_db", run_id=RUN_ID))
-    final_output.append(expand("results/functional_annotations/interproscan/{run_id}/{contrast}_interpro_annotations.csv", run_id=RUN_ID, contrast=CONTRAST))
-    if config["eggnog_results"]:
-        final_output.append(expand("results/functional_annotations/{run_id}/{contrast}_combined_annotations.csv", run_id=RUN_ID, contrast=CONTRAST))
+    # Check if samples are detected
+    if not SAMPLES:
+        raise ValueError("No samples detected. Check 'seq_dir' in config.")
+    
+    final_output = [
+        expand("results/{run_id}/fastqc/{sample}_{group}_fastqc.{ext}",
+               run_id=RUN_ID, sample=set(SAMPLES.sample), group=set(SAMPLES.group), ext=["html", "zip"]),
+        expand("results/{run_id}/hisat2_align/{sample}.sortedByCoord.out.bam", run_id=RUN_ID, sample=set(SAMPLES.sample)),
+        expand("results/{run_id}/feature_counts/{run_id}_counts.txt", run_id=RUN_ID),
+        expand("results/{run_id}/feature_counts/mod_{run_id}_counts.csv", run_id=RUN_ID),
+        expand("results/{run_id}/DEG_analysis/{run_id}_dds.rds", run_id=RUN_ID),
+        expand("results/{run_id}/DEG_analysis/deg_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST),
+    ]
+    # Add DEG visualization files to final output
+    if config["DEG_visualization"] == "yes":
+        final_output.extend([
+            expand("results/{run_id}/DEG_analysis/plots/heatmap.pdf", run_id=RUN_ID),
+            expand("results/{run_id}/DEG_analysis/plots/{contrast}_volcano.pdf", run_id=RUN_ID, contrast=CONTRAST),
+        ])
+    # Add functional annotation files to final output
+    if config["functional_annotation"] == "yes":
+        final_output.extend([
+            expand("resources/{run_id}_gtf_db", run_id=RUN_ID),
+            expand("results/{run_id}/DEG_analysis/{contrast}/trim_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/functional_annotations/interproscan/{run_id}.gff3", run_id=RUN_ID),
+            expand("resources/{run_id}/interpro_results_db", run_id=RUN_ID),
+            expand("results/{run_id}/functional_annotations/interproscan/{contrast}_interpro_annotations.csv", run_id=RUN_ID, contrast=CONTRAST),
+        ])
+        # Add eggnog annotations to final output
+        if config["eggnog_results"]:
+            final_output.append(expand("results/{run_id}/functional_annotations/{contrast}_combined_annotations.csv", run_id=RUN_ID, contrast=CONTRAST))
+
+    # Add enrichment analysis files to final output
+    if config["enrichment_analysis"] == "yes":
+        final_output.extend([
+            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_results.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/enrichment_analysis/fisher_exact/{contrast}_positive_enrichment.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/enrichment_analysis/fisher_exact/{contrast}_negative_enrichment.csv", run_id=RUN_ID, contrast=CONTRAST),
+        ])
+    
     return final_output
 
+# Define the rule to generate the final output
 rule all:
     input:
         get_final_output()
 
 
+# Include the rules
 include:    "rules/fastqc.smk"
 include:    "rules/hisat2_index.smk"
 include:    "rules/hisat2_align.smk"
 include:    "rules/featureCounts.smk"
 include:    "rules/deseq2_prep.smk"
 include:    "rules/deseq2.smk"
-include:    "rules/volcano.smk"
-include:    "rules/heatmap.smk"
-include:    "rules/gtf_db.smk"
-# include:    "rules/protein_seq_extract.smk"
-include:    "rules/interproscan.smk"
-include:    "rules/interpro_annotations.smk"
 
-if config["eggnog_results"]:
-    include: "rules/eggnog_annotations.smk"
+if config["DEG_visualization"] == "yes":
+
+    include:    "rules/volcano.smk"
+    include:    "rules/heatmap.smk"
+
+if config["functional_annotation"] == "yes":
+    include:    "rules/gtf_db.smk"
+    include:    "rules/protein_seq_extract.smk"
+    include:    "rules/interproscan.smk"
+    include:    "rules/interpro_annotations.smk"
+    if config["eggnog_results"]:
+        include: "rules/eggnog_annotations.smk"
+
+if config["enrichment_analysis"] == "yes":
+    include:    "rules/gsea.smk"
+    include:    "rules/fisher_exact_test.smk"
+
+
 
 
