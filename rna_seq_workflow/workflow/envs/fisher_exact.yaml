@@ -1,0 +1,10 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10.6
+  - pandas=2.2.3
+  - numpy=2.2.1
+  - scipy=1.15.0
+  - statsmodels=0.14.4
+  - matplotlib=3.10.0

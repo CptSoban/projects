@@ -38,7 +38,7 @@ DEG_visualization: "yes"
 functional_annotation: "yes"
 GO_terms: "yes"
 #Additional functional annotation of DEGs (eggNOG-mapper) [Path to eggNOG-mapper results,""] (Optional)
-eggnog_results: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/MM_0t_4hjca.emapper.annotations.tsv
+eggnog_results: /home/nanopore/projects/rna_seq_workflow/resources/rna_seq_foxy/MM_q9cdc4ue.emapper.annotations.tsv
 
 #Pathway enrichment analysis of DEGs (Fishers exact test, GSEA) (KEGG) ["yes",""]
 enrichment_analysis: "yes"

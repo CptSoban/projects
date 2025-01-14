@@ -66,9 +66,9 @@ def get_final_output():
     # Add enrichment analysis files to final output
     if config["enrichment_analysis"] == "yes":
         final_output.extend([
+            expand("resources/{run_id}/enrichment_analysis/kegg_request/{run_id}_kegg_cache.json", run_id=RUN_ID),
             expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_results.csv", run_id=RUN_ID, contrast=CONTRAST),
-            expand("results/{run_id}/enrichment_analysis/fisher_exact/{contrast}_positive_enrichment.csv", run_id=RUN_ID, contrast=CONTRAST),
-            expand("results/{run_id}/enrichment_analysis/fisher_exact/{contrast}_negative_enrichment.csv", run_id=RUN_ID, contrast=CONTRAST),
+            # expand("results/{run_id}/enrichment_analysis/fisher_exact/{contrast}_forest_plot.png", run_id=RUN_ID, contrast=CONTRAST),
         ])
     
     return final_output
@@ -101,8 +101,9 @@ if config["functional_annotation"] == "yes":
         include: "rules/eggnog_annotations.smk"
 
 if config["enrichment_analysis"] == "yes":
+    include:    "rules/kegg_request.smk"
     include:    "rules/gsea.smk"
-    include:    "rules/fisher_exact_test.smk"
+    # include:    "rules/fisher_exact_test.smk"
 
 
 

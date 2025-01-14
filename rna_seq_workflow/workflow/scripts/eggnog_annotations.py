@@ -37,9 +37,9 @@ annotated_results = annotated_results.sort_values(by=["log2FoldChange","padj"], 
 
 annotated_results.to_csv(snakemake.output["combined_annotations"])
 
-# Try to delete the interpro file.
-try:
-    os.remove(snakemake.input["annotated_results"])
-except OSError as e:
-    # If it fails, inform the user.
-    print("Error: %s - %s." % (e.filename, e.strerror))
+# # Try to delete the interpro file.
+# try:
+#     os.remove(snakemake.input["annotated_results"])
+# except OSError as e:
+#     # If it fails, inform the user.
+#     print("Error: %s - %s." % (e.filename, e.strerror))
