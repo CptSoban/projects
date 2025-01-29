@@ -54,7 +54,7 @@ def get_final_output():
     if config["functional_annotation"] == "yes":
         final_output.extend([
             expand("resources/{run_id}_gtf_db", run_id=RUN_ID),
-            expand("results/{run_id}/DEG_analysis/{contrast}/trim_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/DEG_analysis/trimmed/trim_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST),
             expand("results/{run_id}/functional_annotations/interproscan/{run_id}.gff3", run_id=RUN_ID),
             expand("resources/{run_id}/interpro_results_db", run_id=RUN_ID),
             expand("results/{run_id}/functional_annotations/interproscan/{contrast}_interpro_annotations.csv", run_id=RUN_ID, contrast=CONTRAST),

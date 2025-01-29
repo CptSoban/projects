@@ -1,6 +1,6 @@
 rule interpro_annotation:
     input:
-        first_results = "results/{run_id}/DEG_analysis/{contrast}/trim_{contrast}.csv",
+        first_results = "results/{run_id}/DEG_analysis/trimmed/trim_{contrast}.csv",
         interpro_gff = "resources/{run_id}/interpro_results_db"
 
     output:

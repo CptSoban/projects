@@ -57,8 +57,8 @@ enrichment_results = gp.prerank(
     gene_sets=gene_sets,
     outdir=None,  # Set to a folder if you want to save results
     permutation_num=10000,  # Increase for more robust results
-    min_size=3,  # Minimum size of gene sets to include in analysis
-    max_size=500,  # Maximum size of gene sets
+    min_size=10,  # Minimum size of gene sets to include in analysis
+    max_size=250,  # Maximum size of gene sets
 )
 
 ### Process and save results ###
@@ -71,7 +71,7 @@ gsea_results_df = gsea_results_df.dropna(subset=['FDR q-val'])
 gsea_results_df.to_csv(snakemake.output["gsea_results"], index=False)
 
 # Filter the results by FDR q-value
-gsea_results_df = gsea_results_df[gsea_results_df["FDR q-val"] < 0.1]
+gsea_results_df = gsea_results_df[gsea_results_df["FDR q-val"] < 0.05]
 
 # Select the significant pathways and sort by NES
 top_pathways = gsea_results_df[["Term", "NES"]].sort_values("NES", ascending=False)
