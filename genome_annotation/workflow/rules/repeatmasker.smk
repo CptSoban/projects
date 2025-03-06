@@ -1,17 +1,16 @@
 
-
 rule repeatmasker:
     input:
         genome_assembly = config["genome_assembly"],
 
     output:
-        masked_genome = "results/repeatmasker/{run_id}/{run_id}.fasta.masked",
+        masked_genome = "results/{run_id}/repeatmasker/"+ASSEMBLY_BASE+".fasta.masked",
 
     params:
-        out_dir = directory("results/repeatmasker/{run_id}"),
+        out_dir = directory("results/{run_id}/repeatmasker"),
         reference_taxon = config["DFAM taxon"],
 
     conda:
         "../envs/repeatmasker.yaml"
 
-    shell: """RepeatMasker -species {params.reference_taxon} -dir {params.out_dir} -gff -xsmall -e ncbi {input.genome_assembly}""" 
+    shell: """RepeatMasker -species {params.reference_taxon} -dir {params.out_dir} -gff -xsmall -e ncbi -s {input.genome_assembly}""" 

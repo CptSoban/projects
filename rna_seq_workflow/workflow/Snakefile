@@ -37,13 +37,17 @@ def get_final_output():
     
     final_output = [
         expand("results/{run_id}/fastqc/{sample}_{group}_fastqc.{ext}",
-               run_id=RUN_ID, sample=set(SAMPLES.sample), group=set(SAMPLES.group), ext=["html", "zip"]),
-        expand("results/{run_id}/hisat2_align/{sample}.sortedByCoord.out.bam", run_id=RUN_ID, sample=set(SAMPLES.sample)),
-        expand("results/{run_id}/feature_counts/{run_id}_counts.txt", run_id=RUN_ID),
-        expand("results/{run_id}/feature_counts/mod_{run_id}_counts.csv", run_id=RUN_ID),
-        expand("results/{run_id}/DEG_analysis/{run_id}_dds.rds", run_id=RUN_ID),
-        expand("results/{run_id}/DEG_analysis/deg_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST),
-    ]
+               run_id=RUN_ID, sample=set(SAMPLES.sample), group=set(SAMPLES.group), ext=["html", "zip"]),]
+
+    # Add DEG analysis files to final output
+    if config["DEG_analysis"] == "yes":
+        final_output.extend([
+            expand("results/{run_id}/hisat2_align/{sample}.sortedByCoord.out.bam", run_id=RUN_ID, sample=set(SAMPLES.sample)),
+            expand("results/{run_id}/feature_counts/{run_id}_counts.txt", run_id=RUN_ID),
+            expand("results/{run_id}/feature_counts/mod_{run_id}_counts.csv", run_id=RUN_ID),
+            expand("results/{run_id}/DEG_analysis/{run_id}_dds.rds", run_id=RUN_ID),
+            expand("results/{run_id}/DEG_analysis/deg_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST),
+        ])
     # Add DEG visualization files to final output
     if config["DEG_visualization"] == "yes":
         final_output.extend([
@@ -68,6 +72,7 @@ def get_final_output():
         final_output.extend([
             expand("resources/{run_id}/enrichment_analysis/kegg_request/{run_id}_kegg_cache.json", run_id=RUN_ID),
             expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_results.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_plot.png", run_id=RUN_ID, contrast=CONTRAST),
             # expand("results/{run_id}/enrichment_analysis/fisher_exact/{contrast}_forest_plot.png", run_id=RUN_ID, contrast=CONTRAST),
         ])
     
@@ -81,28 +86,38 @@ rule all:
 
 # Include the rules
 include:    "rules/fastqc.smk"
-include:    "rules/hisat2_index.smk"
-include:    "rules/hisat2_align.smk"
-include:    "rules/featureCounts.smk"
-include:    "rules/deseq2_prep.smk"
-include:    "rules/deseq2.smk"
+
+if config["DEG_analysis"] == "yes":
+    include:    "rules/hisat2_index.smk"
+    include:    "rules/hisat2_align.smk"
+    include:    "rules/featureCounts.smk"
+    include:    "rules/deseq2_prep.smk"
+    include:    "rules/deseq2.smk"
+else:
+    print("Skipping DEG analysis...")
 
 if config["DEG_visualization"] == "yes":
 
     include:    "rules/volcano.smk"
     include:    "rules/heatmap.smk"
+else:
+    print("Skipping DEG visualization...")
 
 if config["functional_annotation"] == "yes":
     include:    "rules/gtf_db.smk"
     include:    "rules/protein_seq_extract.smk"
     include:    "rules/interproscan.smk"
     include:    "rules/interpro_annotations.smk"
+else:
+    print("Skipping functional annotation...")
     if config["eggnog_results"]:
         include: "rules/eggnog_annotations.smk"
 
 if config["enrichment_analysis"] == "yes":
     include:    "rules/kegg_request.smk"
     include:    "rules/gsea.smk"
+else:
+    print("Skipping enrichment analysis...")
     # include:    "rules/fisher_exact_test.smk"
 
 

@@ -2,19 +2,19 @@
 
 genome_assembly: /home/nanopore/projects/simona/cloro_assembly/flye_assembly/clonostachys_rosea.fasta
 
-rna_reads_directory : 
+rna_reads_directory : /home/nanopore/projects/rna_seq_workflow/resources/20250206_CLORO/reads
 #or
-SRA_accession: SRR26555584
+SRA_accession: 
 
-Run ID: clonostachys_rosea
+Run ID: clonostachys_rosea_test
 
 DFAM taxon: fungi
 
-eggnog_results: /home/nanopore/projects/genome_annotation/resources/clonostachys_rosea/MM_b_dstdr_.emapper.annotations.tsv
+eggnog_results: 
 
 GO_terms: "yes"
 
-threads: 8 
+threads: 12
 
 # Causes bug in BRAKER!
-Fungi: 
+Fungi: ""

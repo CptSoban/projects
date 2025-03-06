@@ -1,44 +1,44 @@
 rule AUGUSTUS_install:
     output:
-        augustus_config = directory(config["work_dir"]+"/resources/Augustus/config"),
+        augustus_config = directory("resources/Augustus/config"),
 
-    shell:  """git clone https://github.com/Gaius-Augustus/Augustus.git resources/"""  
+    shell:  """git clone https://github.com/Gaius-Augustus/Augustus.git resources/Augustus"""  
 
-# rule decompress_gz:
-#     input:
-#         config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz"
-#     output:
-#         config["rna_reads_directory"]+"/{sample}_{group}.fastq"
+rule build_braker3:
+    output:
+        "resources/braker3.sif"
 
-#     shell:  """gzip -d {input}"""
-
+    shell:  """apptainer build --force resources/braker3.sif docker://teambraker/braker3:latest"""
 
 rule BRAKER3:
     input:
-        rna_reads = expand(config["rna_reads_directory"]+"/{sample}_{group}.fastq", sample=config["samples"], group=["1","2"]),
+        rna_reads = expand(config["rna_reads_directory"]+"/cloroAOK1_{group}.fastq.gz", sample=set(SAMPLES.sample), group=set(SAMPLES.group)),
         augustus_config = "resources/Augustus/config",
-        masked_genome = "results/repeatmasker/{run_id}/{run_id}.fasta.masked",
+        masked_genome = "results/{run_id}/repeatmasker/"+ASSEMBLY_BASE+".fasta.masked",
         rna_reads_dir = config["rna_reads_directory"],
+        container_file = "resources/braker3.sif",
     output:
-        braker_gtf = "results/braker/{run_id}/braker.gtf",
-        braker_aa = "results/braker/{run_id}/braker.aa",
+        braker_gtf = "results/{run_id}/braker/braker.gtf",
+        braker_aa = "results/{run_id}/braker/braker.aa",
     params:
-        fungi = "--fungus" if config["Fungi"] == "+" else "",
-        species_name = config["Run ID"],
-        out_dir = directory("results/braker/{run_id}")
+        fungi = "--fungus" if config["Fungi"] == "yes" else "",
+        species_name = config["Run ID"], ###?
+        rna_ids = "cloroAOK1", #",".join(set(SAMPLES.sample)),
+        out_dir = directory("results/{run_id}/braker/")
 
-    container:
-        "/home/marc/projects/genome_annotation/resources/braker3.sif"
-    threads:
-        config["Threads"]
+    shell: """
+    apptainer exec -B $(realpath {params.out_dir}) \
+    {input.container_file} braker.pl \
+    {params.fungi} \
+    --species={params.species_name} \
+    --genome={input.masked_genome} \
+    --rnaseq_sets_ids={params.rna_ids} \
+    --rnaseq_sets_dirs={input.rna_reads_dir} \
+    --workingdir={params.out_dir} \
+    --AUGUSTUS_CONFIG_PATH=$(realpath {input.augustus_config}) \
+    --threads=8
+    """
 
-    shell: """braker.pl --threads={threads} {params.fungi} --species={params.species_name} --genome={input.masked_genome} --rnaseq_sets_ids={wildcards.sample} --rnaseq_sets_dirs={input.rna_reads_dir} --workingdir={params.out_dir} --AUGUSTUS_CONFIG_PATH={input.augustus_config}"""
-
-# rule compress_gz:
-#     input:
-#         rna_reads = config["rna_reads_directory"]+"/{sample}_{group}.fastq",
-#         expand("results/braker/{run_id}/braker.gtf", run_id=config["Run ID"])
-#     output:
-#         config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz"
-
-#     shell:  """gzip {input.rna_reads}"""
+    # in case Augustus is updated and is not the same version as in the braker3.sif, you can instead copy the config folder from within the braker3.sif
+    # apptainer exec --cleanenv {input.container_file} cp -r /opt/Augustus/config . |\
+    # chmod -R 777 ./config |\

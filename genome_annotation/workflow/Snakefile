@@ -1,23 +1,22 @@
 import os
 import glob
+from pathlib import Path
 from snakemake.utils import min_version
 min_version("8.11.3")
 
 configfile: "config/config.yaml"
 
+# Define the samples
+SAMPLES = glob_wildcards(config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz")
+ASSEMBLY_BASE = Path(config["genome_assembly"]).stem
+
 RUN_ID = config["Run ID"]
 
 def get_final_output():
     final_output = expand(
-        "results/braker/{run_id}/braker.gtf", run_id=RUN_ID
+        "results/{run_id}/braker/braker.gtf", run_id=RUN_ID
     )
-    final_output.append(expand("results/braker/{run_id}/braker.aa", run_id=RUN_ID))
-    final_output.append(expand("resources/{run_id}_gtf_db", run_id=RUN_ID))
-    final_output.append(expand("results/functional_annotations/{run_id}/interproscan/{run_id}.gff3", run_id=RUN_ID))
-    final_output.append(expand("resources/{run_id}/interpro_results_db", run_id=RUN_ID))
-    final_output.append(expand("results/functional_annotations/interproscan/{run_id}/interpro_annotations.csv", run_id=RUN_ID))
-    if config["eggnog_results"]:
-        final_output.append(expand("results/functional_annotations/{run_id}/combined_annotations.csv", run_id=RUN_ID))
+    final_output.append(expand("results/{run_id}/braker/braker.aa", run_id=RUN_ID))
     return final_output
 
 rule all:
@@ -31,12 +30,6 @@ if config["rna_reads_directory"]:
 elif config["SRA_accession"]:
     include:    "rules/BRAKER3_SRA.smk"
 
-include:    "rules/gtf_db.smk"
-include:    "rules/interproscan.smk"
-include:    "rules/interpro_annotations.smk"
-
-if config["eggnog_results"]:
-    include: "rules/eggnog_annotations.smk"
 
 
 
