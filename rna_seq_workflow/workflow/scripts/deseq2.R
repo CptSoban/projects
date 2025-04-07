@@ -7,7 +7,7 @@ library(apeglm)
 counts_data <- read.csv(snakemake@input[["prep_counts_table"]])
 
 #Sample info
-sample_info <- read.csv(snakemake@input[["sample_info"]], sep = "\t")
+sample_info <- read.csv(snakemake@input[["sample_info"]])
 
 #Converst first column to rownames
 counts_data <- column_to_rownames(counts_data, var = "Geneid")

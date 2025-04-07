@@ -51,7 +51,7 @@ def get_final_output():
     # Add DEG visualization files to final output
     if config["DEG_visualization"] == "yes":
         final_output.extend([
-            expand("results/{run_id}/DEG_analysis/plots/heatmap.pdf", run_id=RUN_ID),
+            expand("results/{run_id}/DEG_analysis/plots/heatmap.svg", run_id=RUN_ID),
             expand("results/{run_id}/DEG_analysis/plots/{contrast}_volcano.pdf", run_id=RUN_ID, contrast=CONTRAST),
         ])
     # Add functional annotation files to final output
@@ -71,8 +71,10 @@ def get_final_output():
     if config["enrichment_analysis"] == "yes":
         final_output.extend([
             expand("resources/{run_id}/enrichment_analysis/kegg_request/{run_id}_kegg_cache.json", run_id=RUN_ID),
-            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_results.csv", run_id=RUN_ID, contrast=CONTRAST),
-            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_plot.png", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_results_pathways.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_plot_pathways.png", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_results_modules.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_plot_modules.png", run_id=RUN_ID, contrast=CONTRAST),
             # expand("results/{run_id}/enrichment_analysis/fisher_exact/{contrast}_forest_plot.png", run_id=RUN_ID, contrast=CONTRAST),
         ])
     

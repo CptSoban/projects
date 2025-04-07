@@ -4,7 +4,7 @@ rule heatmap:
         normalized_counts = "results/{run_id}/DEG_analysis/{run_id}_normalized_counts.csv",
 
     output:
-        heatmap_plot = "results/{run_id}/DEG_analysis/plots/heatmap.pdf",
+        heatmap_plot = "results/{run_id}/DEG_analysis/plots/heatmap.svg",
 
     conda:
         "../envs/complex_heatmap.yaml"

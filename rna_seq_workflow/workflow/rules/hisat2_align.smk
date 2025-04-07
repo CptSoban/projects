@@ -1,7 +1,7 @@
 rule hisat2_align:
     input:
-        r1 = config["seq_dir"]+"/{sample}_1.fastq.gz",
-        r2 = config["seq_dir"]+"/{sample}_2.fastq.gz",
+        r1 = config["seq_dir"]+"/{sample}_R1.fastq.gz",
+        r2 = config["seq_dir"]+"/{sample}_R2.fastq.gz",
         index_files = "results/{run_id}/hisat2_index/{run_id}.1.ht2",
         fastqc_output = expand("results/{run_id}/fastqc/{sample}_{group}_fastqc.html", run_id=RUN_ID, sample=set(SAMPLES.sample), group=set(SAMPLES.group))
     output:

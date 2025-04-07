@@ -90,14 +90,14 @@ rule pull_interpro_sif:
     output:
         "resources/interproscan_latest.sif"
     shell:
-        "apptainer pull --force --dir resources/ docker://interpro/interproscan:latest"
+        "apptainer pull --force --dir resources/ docker://interpro/interproscan:5.73-104.0"
 
 # Run InterProScan
 rule interproscan_run:
     input:
         cleaned_aa = "results/{run_id}/functional_annotations/cleaned.aa",
         interpro_data = latest_interpro_data,
-        container_file = "resources/interproscan_latest.sif"
+        container_file = "resources/interproscan_5.73-104.0.sif"
 
     output:
         interpro_gff = "results/{run_id}/functional_annotations/interproscan/{run_id}.gff3",

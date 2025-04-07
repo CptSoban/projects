@@ -27,7 +27,7 @@ for col_name in counts_df.columns:
     counts_df.rename(columns={col_name: new_col_name}, inplace=True)
 
 #Read in sample information (e.g. "treated" or "control")
-sample_info_df = pd.read_csv(snakemake.input["sample_info"], sep="\t", header=0)
+sample_info_df = pd.read_csv(snakemake.input["sample_info"], header=0)
 #Put sample ids from sample information in a list
 sorted_sample_list = sample_info_df["sample"].tolist()
 #Geneid is a column name in the countstable, an has to be included in the sorted list
