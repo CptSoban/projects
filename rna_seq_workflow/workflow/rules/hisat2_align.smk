@@ -21,6 +21,7 @@ rule hisat2_align:
     shell:  """hisat2 -x {params.basename} \
             -1 {input.r1} \
             -2 {input.r2} \
+            --rna-strandness {params.strandness} \
             --summary-file {log.summary} \
             --met-file {log.metrics} | \
             samtools sort -o {output.bam_file}"""

@@ -1,0 +1,42 @@
+### CONFIG for amplicon workflow ###
+# Note: This is a sample configuration file. Adjust the paths and parameters as needed.
+
+### General Information ###
+
+# Threads for parallel processing
+threads: 62 # For stability, max 62 threads are recommended if you run with --cores all.
+
+# Run ID for the analysis
+run_id: "protisten_TH_16S" # Recommended to use the same run ID as the MinKNOW experiment name for provenance tracking.
+
+# Path to the directory containing the barcode folders
+reads_dir: "/mnt/d/MinKNOW/experiments/protist_study_TH/TH/20250408_2339_MN45285_FBC25361_d2368631/fastq_pass/16S"
+
+### Concat, PCR-Primer trimming and inital filtering ###
+
+# Minimum and maximum length of reads to keep
+min_length: 1000
+max_length: 2000
+# Minimum quality score for filtering (10 = 10% error rate, 20 = 1% error rate)
+min_quality: 10
+
+# PCR primer sequences to trim from the reads in fasta format (header form: [id]_front/rear type=primer) (OPTIONAL)
+#primer_fasta: "/home/nanopore/projects/amplicon_workflow/resources/primer_seq/27F_1492R.fa"
+
+### Chimera removal ###
+
+# Denovo or reference based chimera removal
+chimera_removal: "denovo"  # Options: "denovo", "ref"
+# Path to the reference database for chimera removal (if using reference based)
+chimera_db: "/path/to/reference_db.fasta"
+
+### Emu classification ###
+
+## Path to the reference database (default (16S) or custom). 
+# Note that some prebuild alternative databases (e.g. SILVA) are available through the emu repository (https://github.com/treangenlab/emu).
+# The custom database folder should contain sequences.fasta, taxonomy.tsv (sequence id to taxid mapping) and species_taxid.tsv (taxid to lineage mapping)). 
+# See /home/nanopore/projects/amplicon_workflow/resources/custom_dbs/pr2_510_emu/ for an example.
+reference_db_emu: "/home/nanopore/projects/amplicon_workflow/resources/emu_db" 
+
+# Minimal relative abundance of a taxon to be included in the final report (0.01 = 1% abundance)
+min_abundance: 0.001

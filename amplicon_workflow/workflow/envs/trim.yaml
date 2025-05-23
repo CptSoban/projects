@@ -1,0 +1,6 @@
+channels:
+ - conda-forge
+ - bioconda
+ - nanoporetech
+dependencies:
+- fastcat=0.22.0

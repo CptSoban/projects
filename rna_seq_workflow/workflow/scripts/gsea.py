@@ -116,14 +116,14 @@ def plot_gsea_results(results_df, term_type):
 
     ax.set_xlabel("Normalized Enrichment Score (NES)")
     ax.set_ylabel(term_type.capitalize())
-    ax.set_title(f"Enriched KEGG {term_type} in GSEA (FDR < 0.1)")
+    #ax.set_title(f"Enriched KEGG {term_type} in GSEA (FDR < 0.1)")
 
     # Create colorbar
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
 
     # Shrink colorbar and reverse direction (high FDR at bottom)
-    cbar = fig.colorbar(sm, ax=ax, aspect=30)
+    cbar = fig.colorbar(sm, ax=ax, aspect=20, shrink=0.35)
     cbar.ax.invert_yaxis()  # invert the colorbar to show low FDR at the top
     cbar.set_label("FDR q-value")
 

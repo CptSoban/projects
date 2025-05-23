@@ -6,9 +6,9 @@ rna_reads_directory : /home/nanopore/projects/rna_seq_workflow/resources/2025020
 #or
 SRA_accession: 
 
-Run ID: clonostachys_rosea_test
+Run ID: clonostachys_rosea
 
-DFAM taxon: fungi
+DFAM taxon: ascomycota
 
 eggnog_results: 
 
@@ -17,4 +17,4 @@ GO_terms: "yes"
 threads: 12
 
 # Causes bug in BRAKER!
-Fungi: ""
+Fungi: "yes"

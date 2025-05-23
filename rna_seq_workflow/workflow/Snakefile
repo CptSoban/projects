@@ -110,10 +110,11 @@ if config["functional_annotation"] == "yes":
     include:    "rules/protein_seq_extract.smk"
     include:    "rules/interproscan.smk"
     include:    "rules/interpro_annotations.smk"
+elif config["eggnog_results"]:
+        include: "rules/eggnog_annotations.smk"
 else:
     print("Skipping functional annotation...")
-    if config["eggnog_results"]:
-        include: "rules/eggnog_annotations.smk"
+
 
 if config["enrichment_analysis"] == "yes":
     include:    "rules/kegg_request.smk"

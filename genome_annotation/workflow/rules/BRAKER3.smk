@@ -12,7 +12,7 @@ rule build_braker3:
 
 rule BRAKER3:
     input:
-        rna_reads = expand(config["rna_reads_directory"]+"/cloroAOK1_{group}.fastq.gz", sample=set(SAMPLES.sample), group=set(SAMPLES.group)),
+        rna_reads = expand(config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz", sample=set(SAMPLES.sample), group=set(SAMPLES.group)),
         augustus_config = "resources/Augustus/config",
         masked_genome = "results/{run_id}/repeatmasker/"+ASSEMBLY_BASE+".fasta.masked",
         rna_reads_dir = config["rna_reads_directory"],
@@ -25,19 +25,20 @@ rule BRAKER3:
         species_name = config["Run ID"], ###?
         rna_ids = "cloroAOK1", #",".join(set(SAMPLES.sample)),
         out_dir = directory("results/{run_id}/braker/")
+    
 
-    shell: """
-    apptainer exec -B $(realpath {params.out_dir}) \
-    {input.container_file} braker.pl \
-    {params.fungi} \
-    --species={params.species_name} \
-    --genome={input.masked_genome} \
-    --rnaseq_sets_ids={params.rna_ids} \
-    --rnaseq_sets_dirs={input.rna_reads_dir} \
-    --workingdir={params.out_dir} \
-    --AUGUSTUS_CONFIG_PATH=$(realpath {input.augustus_config}) \
-    --threads=8
-    """
+    shell:  """
+            apptainer exec -B $(realpath {params.out_dir}) \
+            {input.container_file} braker.pl \
+            {params.fungi} \
+            --species={params.species_name} \
+            --genome={input.masked_genome} \
+            --rnaseq_sets_ids={params.rna_ids} \
+            --rnaseq_sets_dirs={input.rna_reads_dir} \
+            --workingdir={params.out_dir} \
+            --AUGUSTUS_CONFIG_PATH=$(realpath {input.augustus_config}) \
+            --threads=8
+            """
 
     # in case Augustus is updated and is not the same version as in the braker3.sif, you can instead copy the config folder from within the braker3.sif
     # apptainer exec --cleanenv {input.container_file} cp -r /opt/Augustus/config . |\

@@ -75,3 +75,17 @@ gsea/MOT_vs_OT_gsea_results.csv
 gsea/OT_vs_OK_gsea_plot.png
 gsea/OT_vs_OK_gsea_results.csv
 genome_annotation/.ncbi/user-settings.mkfg
+rna_seq_workflow/cluster1_genes.csv
+rna_seq_workflow/cluster2_genes.csv
+rna_seq_workflow/cluster3_genes.csv
+rna_seq_workflow/cluster4_genes.csv
+rna_seq_workflow/cluster5_genes.csv
+rna_seq_workflow/cluster6_genes.csv
+rna_seq_workflow/cluster7_genes.csv
+rna_seq_workflow/cluster8_genes.csv
+rna_seq_workflow/cluster9_genes.csv
+/protisten_TH/
+/amplicon_workflow/.snakemake
+/amplicon_workflow/results
+/amplicon_workflow/reports
+/amplicon_workflow/resources
