@@ -41,6 +41,7 @@ rule all:
     input:
         get_final_output()
 
+# Include the rules for the workflow
 include:    "rules/concat.smk"
 
 if config["chimera_removal"] == "ref":

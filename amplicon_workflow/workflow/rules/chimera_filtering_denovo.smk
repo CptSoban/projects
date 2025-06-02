@@ -19,7 +19,7 @@ rule chimera_filtering:
     output:
         chim_filt_reads = temp("results/{run_id}/chimera_filtering/{barcode}_nochim.fa")
     
-    log: "../reports/{run_id}/{barcode}_chimera_filtering.log"
+    log: "/reports/{run_id}/{barcode}_chimera_filtering.log"
 
     params: threads = config["threads"],
 

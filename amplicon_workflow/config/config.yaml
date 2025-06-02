@@ -4,13 +4,13 @@
 ### General Information ###
 
 # Threads for parallel processing
-threads: 62 # For stability, max 62 threads are recommended if you run with --cores all.
+threads: 64 # For stability, calculate threads as 2x the available cores (max cores=32)
 
 # Run ID for the analysis
-run_id: "protisten_TH_16S" # Recommended to use the same run ID as the MinKNOW experiment name for provenance tracking.
+run_id: "16S_compost_lara" # Recommended to use the same run ID as the MinKNOW experiment name for provenance tracking.
 
 # Path to the directory containing the barcode folders
-reads_dir: "/mnt/d/MinKNOW/experiments/protist_study_TH/TH/20250408_2339_MN45285_FBC25361_d2368631/fastq_pass/16S"
+reads_dir: "/mnt/d/MinKNOW/experiments/16S_compost_lara/16S_compost/20240408_1737_MN45285_FAY62232_6b520ec0/fastq_pass"
 
 ### Concat, PCR-Primer trimming and inital filtering ###
 
@@ -27,12 +27,12 @@ min_quality: 10
 
 # Denovo or reference based chimera removal
 chimera_removal: "denovo"  # Options: "denovo", "ref"
-# Path to the reference database for chimera removal (if using reference based)
+# Path to the reference database for chimera removal (OPTIONAL, required if chimera_removal is set to "ref")
 chimera_db: "/path/to/reference_db.fasta"
 
 ### Emu classification ###
 
-## Path to the reference database (default (16S) or custom). 
+## Path to the reference database
 # Note that some prebuild alternative databases (e.g. SILVA) are available through the emu repository (https://github.com/treangenlab/emu).
 # The custom database folder should contain sequences.fasta, taxonomy.tsv (sequence id to taxid mapping) and species_taxid.tsv (taxid to lineage mapping)). 
 # See /home/nanopore/projects/amplicon_workflow/resources/custom_dbs/pr2_510_emu/ for an example.

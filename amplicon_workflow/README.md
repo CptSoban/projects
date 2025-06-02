@@ -27,4 +27,4 @@ Regarding Primer trimming: When setting up the sequencing run through MinKNOW it
 
     snakemake --use-conda --conda-frontend conda --cores all
     
-    Only use --cores all if only one workflow is running. If multiple workflows are running, specify the number of cores to use (e.g., --cores 20 (max=28)).
+    Only use --cores all if only one workflow is running. If multiple workflows or other computational intensive systems (sequencing) are running, specify the number of cores to use (e.g., --cores 20 (max. 32)).
