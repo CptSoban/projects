@@ -13,17 +13,13 @@ Regarding Primer trimming: When setting up the sequencing run through MinKNOW it
     conda activate snakemake
 
 2.  Fill in the fields in the config.yaml with your information and save the file as config.yaml in the directory projects/amplicon_workflow/config/.
-    Keep a copy of your finished config file in config/old_configs for reference (recommended).
-
-3.  Make sure to have dorado installed and available in your PATH. Check installation with:
-
-    dorado --version
+    You can keep a copy of your config file in config/old_configs for reference.
     
-4.  To test the workflow, perform a dry run with the command in projects/amplicon_workflow/:
+3.  To test the workflow, perform a dry run with the command in projects/amplicon_workflow/:
 
     snakemake -np
 
-5.  To run the workflow, use the command in projects/amplicon_workflow/:
+4.  To run the workflow, use the command in projects/amplicon_workflow/:
 
     snakemake --use-conda --conda-frontend conda --cores all
     

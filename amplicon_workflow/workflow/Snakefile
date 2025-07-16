@@ -25,7 +25,7 @@ def get_final_output():
     
     final_output = [
         # Add chimera filtered fastq files to final output
-        expand("results/{run_id}/chimera_filtering/{barcode}_nochim.fastq.gz",
+        expand("results/{run_id}/chimera_filtering/{barcode}_nochim.fastq",
                run_id=RUN_ID, barcode=SAMPLES.barcode),]
 
     final_output.extend([

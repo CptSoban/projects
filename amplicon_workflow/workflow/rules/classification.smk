@@ -1,6 +1,6 @@
-rule emu:
+rule emu_classify:
     input:
-        chim_filt_reads_fq = "results/{run_id}/chimera_filtering/{barcode}_nochim.fastq.gz"
+        chim_filt_reads_fq = "results/{run_id}/chimera_filtering/{barcode}_nochim.fastq"
     
     output:
         rel_abundance = "results/{run_id}/emu/{barcode}_rel-abundance.tsv",
@@ -22,4 +22,22 @@ rule emu:
             --keep-counts \
             --type map-ont \
             --threads {threads} \
+        """
+
+rule emu_combine:
+    input:
+        rel_abundance = lambda wildcards: expand("results/{run_id}/emu/{barcode}_rel-abundance.tsv", barcode=wildcards.barcode),
+    
+    output:
+        combined_rel_abundance = "results/{run_id}/emu/combined_rel-abundance.tsv",
+    
+    params:
+        output_dir = directory("results/{run_id}/emu"),
+        taxonomic_rank = config["taxonomic_rank"]
+
+    conda:
+        "../envs/classification.yaml"
+
+    shell:"""
+        emu combine-outputs {params.output_dir} {params.taxonomic_rank}
         """

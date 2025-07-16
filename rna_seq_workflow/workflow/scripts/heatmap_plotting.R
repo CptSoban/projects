@@ -22,6 +22,7 @@ heatmap <- Heatmap(norm_counts_z,
                    cluster_columns = TRUE,
                    name = "Z-score")
 
+# Draw the heatmap to get the row dendrogram
 ht <- draw(heatmap)
 row_dend <- row_dend(ht)
 row_clusters <- cutree(as.hclust(row_dend), k = 9)
@@ -40,15 +41,15 @@ cluster9_genes <- rownames(norm_counts_z)[row_clusters == 9]
 
 
 # Save gene lists if desired
-write.csv(cluster1_genes, "cluster1_genes.csv", row.names = FALSE)
-write.csv(cluster2_genes, "cluster2_genes.csv", row.names = FALSE)
-write.csv(cluster3_genes, "cluster3_genes.csv", row.names = FALSE)
-write.csv(cluster4_genes, "cluster4_genes.csv", row.names = FALSE)
-write.csv(cluster5_genes, "cluster5_genes.csv", row.names = FALSE)
-write.csv(cluster6_genes, "cluster6_genes.csv", row.names = FALSE)
-write.csv(cluster7_genes, "cluster7_genes.csv", row.names = FALSE)
-write.csv(cluster8_genes, "cluster8_genes.csv", row.names = FALSE)
-write.csv(cluster9_genes, "cluster9_genes.csv", row.names = FALSE)
+# write.csv(cluster1_genes, "cluster1_genes.csv", row.names = FALSE)
+# write.csv(cluster2_genes, "cluster2_genes.csv", row.names = FALSE)
+# write.csv(cluster3_genes, "cluster3_genes.csv", row.names = FALSE)
+# write.csv(cluster4_genes, "cluster4_genes.csv", row.names = FALSE)
+# write.csv(cluster5_genes, "cluster5_genes.csv", row.names = FALSE)
+# write.csv(cluster6_genes, "cluster6_genes.csv", row.names = FALSE)
+# write.csv(cluster7_genes, "cluster7_genes.csv", row.names = FALSE)
+# write.csv(cluster8_genes, "cluster8_genes.csv", row.names = FALSE)
+# write.csv(cluster9_genes, "cluster9_genes.csv", row.names = FALSE)
 
 
 # Add annotation using the **correct matching order**

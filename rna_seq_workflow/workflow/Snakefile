@@ -65,7 +65,11 @@ def get_final_output():
         ])
         # Add eggnog annotations to final output
         if config["eggnog_results"]:
-            final_output.append(expand("results/{run_id}/functional_annotations/{contrast}_combined_annotations.csv", run_id=RUN_ID, contrast=CONTRAST))
+            final_output.extend([
+                expand("results/{run_id}/functional_annotations/{contrast}_combined_annotations.csv", run_id=RUN_ID, contrast=CONTRAST),
+                expand("results/{run_id}/functional_annotations/{contrast}_annotate_id_with_ko.csv", run_id=RUN_ID, contrast=CONTRAST),
+                expand("results/{run_id}/functional_annotations/{contrast}_annotate_ko_with_log2fc.csv", run_id=RUN_ID, contrast=CONTRAST),
+            ])
 
     # Add enrichment analysis files to final output
     if config["enrichment_analysis"] == "yes":
@@ -107,16 +111,17 @@ else:
 
 if config["functional_annotation"] == "yes":
     include:    "rules/gtf_db.smk"
-    include:    "rules/protein_seq_extract.smk"
+    include:    "rules/annotate_deg_with_proteins.smk"
     include:    "rules/interproscan.smk"
     include:    "rules/interpro_annotations.smk"
-elif config["eggnog_results"]:
+    if config["eggnog_results"]:
         include: "rules/eggnog_annotations.smk"
+        include: "rules/kegg_reconstruct.smk"
 else:
     print("Skipping functional annotation...")
 
 
-if config["enrichment_analysis"] == "yes":
+if config["eggnog_results"] and config["enrichment_analysis"] == "yes":
     include:    "rules/kegg_request.smk"
     include:    "rules/gsea.smk"
 else:

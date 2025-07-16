@@ -6,11 +6,6 @@ from matplotlib.colors import LinearSegmentedColormap
 import seaborn as sns
 import json
 
-# Function to filter pathways/modules
-def filter_terms(df, exclude_terms):
-    """Remove pathways/modules that contain any of the exclude_terms."""
-    pattern = '|'.join(exclude_terms)  # Create regex pattern
-    return df[~df['Term'].str.contains(pattern, case=False, na=False)]
 
 ### Load and preprocess the data ###
 df = pd.read_csv(snakemake.input["functional_annotations"])
@@ -61,6 +56,12 @@ def prepare_gsea_data(df, term_column):
 ranked_list_pathways, gene_sets_pathways = prepare_gsea_data(df_pathways, "Pathways")
 ranked_list_modules, gene_sets_modules = prepare_gsea_data(df_modules, "Modules")
 
+# Function to filter pathways/modules
+def filter_terms(df, include_terms):
+    """Filter pathways or modules based on inclusion terms."""
+    pattern = '|'.join(include_terms)  # Create regex pattern
+    return df[df['Term'].str.contains(pattern, case=False, na=False)]
+
 ### Perform GSEA ###
 def run_gsea(ranked_list, gene_sets, term_type):
     """Run GSEA analysis and return filtered results."""
@@ -70,26 +71,26 @@ def run_gsea(ranked_list, gene_sets, term_type):
         outdir=None,
         permutation_num=10000,
         min_size=10,
-        max_size=250,
+        max_size=200,
     )
     
     results_df = pd.DataFrame(results.res2d)
     results_df['FDR q-val'] = pd.to_numeric(results_df['FDR q-val'], errors='coerce')
     results_df = results_df.dropna(subset=['FDR q-val'])
     
-    # Filter results by FDR threshold
+    # Filter results by FDR threshold (0.1)
     results_df = results_df[results_df["FDR q-val"] < 0.1]
-    
-    # Apply filtering for unwanted terms
-    exclude_terms = snakemake.params["filter_terms"]
-    results_df = filter_terms(results_df, exclude_terms)
-    
     # Save results
     results_df.to_csv(snakemake.output[f"gsea_results_{term_type}"], index=False)
     
-
+    # Filter results by FDR threshold
+    results_005_df = results_df[results_df["FDR q-val"] < 0.05]
     
-    return results_df
+    # Apply filtering for unwanted terms
+    exclude_terms = snakemake.params["filter_terms"]
+    results_005_df = filter_terms(results_005_df, exclude_terms)
+    
+    return results_005_df
 
 # Run GSEA for pathways and modules
 gsea_results_pathways = run_gsea(ranked_list_pathways, gene_sets_pathways, "pathways")
@@ -100,10 +101,14 @@ def plot_gsea_results(results_df, term_type):
     """Plot the top enriched pathways/modules with color based on FDR q-value."""
     top_terms = results_df[["Term", "NES", "FDR q-val"]].sort_values("NES", ascending=False)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    bar_thickness = 0.4
+    num_bars = len(top_terms)
+    fig_height = bar_thickness * num_bars + 1.2
+
+    fig, ax = plt.subplots(figsize=(10, fig_height))
     
     # Normalize FDR q-value for color mapping
-    norm = plt.Normalize(top_terms["FDR q-val"].min(), top_terms["FDR q-val"].max())
+    norm = plt.Normalize(vmin=0, vmax=0.05)
     
     # Create a colormap from blue to purple to red
     blue_purple_red = LinearSegmentedColormap.from_list("red_purple_blue", ["red", "purple", "blue"])
@@ -112,25 +117,35 @@ def plot_gsea_results(results_df, term_type):
     bar_colors = cmap(norm(top_terms["FDR q-val"].values))
 
     # Create barplot
-    sns.barplot(data=top_terms, x="NES", y="Term", palette=bar_colors, ax=ax)
+    sns.barplot(data=top_terms, x="NES", y="Term", palette=bar_colors, ax=ax,
+    )
 
-    ax.set_xlabel("Normalized Enrichment Score (NES)")
-    ax.set_ylabel(term_type.capitalize())
+    ax.set_xlabel("Normalized Enrichment Score (NES)", fontsize=16)
+    ax.set_ylabel(term_type.capitalize(), fontsize=16)
     #ax.set_title(f"Enriched KEGG {term_type} in GSEA (FDR < 0.1)")
+    
+    # Set tick parameters
+    ax.tick_params(axis='both', which='major', labelsize=12)
+    ax.spines['top'].set_linewidth(1.2)
+    ax.spines['right'].set_linewidth(1.2)
+    ax.spines['left'].set_linewidth(1.2)
+    ax.spines['bottom'].set_linewidth(1.2)
+    
+    ax.set_ylim(-0.5, num_bars - 0.5)  # tighten y-axis limits
 
     # Create colorbar
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
 
     # Shrink colorbar and reverse direction (high FDR at bottom)
-    cbar = fig.colorbar(sm, ax=ax, aspect=20, shrink=0.35)
+    cbar = fig.colorbar(sm, ax=ax, aspect=20, shrink=0.45)
     cbar.ax.invert_yaxis()  # invert the colorbar to show low FDR at the top
-    cbar.set_label("FDR q-value")
+    cbar.set_label("FDR q-value", fontsize=14)
+    cbar.ax.tick_params(labelsize=12)
 
     plt.tight_layout()
-    plt.savefig(snakemake.output[f"gsea_plot_{term_type}"], dpi=300)
+    plt.savefig(snakemake.output[f"gsea_plot_{term_type}"], dpi=300, transparent=True)
     plt.close()
-
 
 
 # Plot results

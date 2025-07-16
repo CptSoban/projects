@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from Bio import SeqIO
 import gffutils
 
@@ -18,7 +17,7 @@ all_genes_df = all_genes_df[["symbol", "log2FoldChange", "baseMean", "padj"]]
 all_genes_df.dropna(inplace = True)
 
 #Mask to filter lowly expressed genes
-filter_mask_baseMean = (all_genes_df["baseMean"] >= 100)
+filter_mask_baseMean = (all_genes_df["baseMean"] >= snakemake.params["base_mean_threshold"])
 
 #Table containing significant DEGs and non-DEGs
 most_DEG_df = all_genes_df[filter_mask_baseMean]

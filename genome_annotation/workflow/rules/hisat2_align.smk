@@ -1,9 +1,8 @@
 rule hisat2_align:
     input:
-        r1 = config["seq_dir"]+"/{sample}_1.fastq.gz",
-        r2 = config["seq_dir"]+"/{sample}_2.fastq.gz",
-        index_files = "results/{run_id}/hisat2_index/{run_id}.1.ht2",
-        fastqc_output = expand("results/{run_id}/fastqc/{sample}_{group}_fastqc.html", run_id=RUN_ID, sample=set(SAMPLES.sample), group=set(SAMPLES.group))
+        r1 = config["rna_reads_directory"]+"/{sample}_1.fastq.gz",
+        r2 = config["rna_reads_directory"]+"/{sample}_2.fastq.gz",
+        index_files = "resources/{run_id}/hisat2_index/{run_id}.1.ht2"
     output:
         bam_file = "results/{run_id}/hisat2_align/{sample}.sortedByCoord.out.bam"
 
@@ -12,18 +11,16 @@ rule hisat2_align:
         metrics = "reports/{run_id}/hisat2_align/{sample}_metrics.log"
 
     params:
-        basename = "results/{run_id}/hisat2_index/{run_id}",
+        basename = "resources/{run_id}/hisat2_index/{run_id}",
         strandness = config["Strandness"][0]
-    
-    threads: config["threads"]
 
     conda:
         "../envs/hisat2.yaml"
 
     shell:  """hisat2 -x {params.basename} \
-            -p {threads} \
             -1 {input.r1} \
             -2 {input.r2} \
+            --dta \
             --rna-strandness {params.strandness} \
             --summary-file {log.summary} \
             --met-file {log.metrics} | \

@@ -1,16 +1,16 @@
 ### CONFIG for amplicon workflow ###
 # Note: This is a sample configuration file. Adjust the paths and parameters as needed.
 
-### General Information ###
+### General settings ###
 
 # Threads for parallel processing
-threads: 64 # For stability, calculate threads as 2x the available cores (max cores=32)
+threads: 40 # For stability, calculate threads as 2x the available cores (max cores=32)
 
 # Run ID for the analysis
-run_id: "16S_compost_lara" # Recommended to use the same run ID as the MinKNOW experiment name for provenance tracking.
+run_id: "16S_compost_lara_SUP"
 
 # Path to the directory containing the barcode folders
-reads_dir: "/mnt/d/MinKNOW/experiments/16S_compost_lara/16S_compost/20240408_1737_MN45285_FAY62232_6b520ec0/fastq_pass"
+reads_dir: "/mnt/d/MinKNOW/experiments/16S_compost_lara/16S_compost/20240408_1737_MN45285_FAY62232_6b520ec0/fast5_pass/basecalling/pass"
 
 ### Concat, PCR-Primer trimming and inital filtering ###
 
@@ -28,9 +28,11 @@ min_quality: 10
 # Denovo or reference based chimera removal
 chimera_removal: "denovo"  # Options: "denovo", "ref"
 # Path to the reference database for chimera removal (OPTIONAL, required if chimera_removal is set to "ref")
-chimera_db: "/path/to/reference_db.fasta"
+chimera_db: "/home/nanopore/projects/amplicon_workflow/resources/emu_db/species_taxid.fasta"
 
 ### Emu classification ###
+
+taxonomic_rank: "species"  # Options: "species", "genus", "family", "order", "class", "phylum", "superkingdom"
 
 ## Path to the reference database
 # Note that some prebuild alternative databases (e.g. SILVA) are available through the emu repository (https://github.com/treangenlab/emu).
@@ -39,4 +41,4 @@ chimera_db: "/path/to/reference_db.fasta"
 reference_db_emu: "/home/nanopore/projects/amplicon_workflow/resources/emu_db" 
 
 # Minimal relative abundance of a taxon to be included in the final report (0.01 = 1% abundance)
-min_abundance: 0.001
+min_abundance: 0.0001

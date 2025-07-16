@@ -3,13 +3,14 @@ rule fastcat:
         reads = lambda wildcards: expand(config['reads_dir']+"/{barcode}/{sample}.fastq.gz", barcode=wildcards.barcode, sample=samples_per_barcode[wildcards.barcode]),
     output:
         concat_trimm_reads = temp("results/{run_id}/trimming/{barcode}_trim.fastq"),
+        reports = directory("reports/{run_id}/{barcode}_fastcat.log"),
     params:
         reads_dir = config["reads_dir"]+"/{barcode}",
         min_length = config["min_length"],
         max_length = config["max_length"],
-        min_quality = config["min_quality"]
-    
-    log:    "reports/{run_id}/{barcode}_fastcat.log"
+        min_quality = config["min_quality"],
+        
+
     conda:
         "../envs/trim.yaml"
     
@@ -18,7 +19,7 @@ rule fastcat:
                 -a {params.min_length} \
                 -b {params.max_length} \
                 --min_qscore={params.min_quality} \
-                --histograms {log} \
+                --histograms={output.reports} \
                 {params.reads_dir} \
                 > {output.concat_trimm_reads} \
             """

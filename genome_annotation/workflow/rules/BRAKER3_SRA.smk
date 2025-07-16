@@ -16,7 +16,7 @@ rule build_braker3:
     output:
         "resources/braker3.sif"
 
-    shell:  """apptainer build --force resources/braker3.sif docker://teambraker/braker3:latest"""
+    shell:  """apptainer build --force resources/braker3.sif docker://teambraker/braker3:v3.0.7.6"""
 
 rule BRAKER3_SRA:
     input:

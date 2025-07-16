@@ -1,13 +1,13 @@
 rule fq2fa:
     input:
-        trimmed_reads = "results/{run_id}/trimming/{barcode}_finaltrim.fastq.gz",
+        trimmed_reads = "results/{run_id}/trimming/{barcode}_trim.fastq",
     output:
         trimmed_reads_fa = temp("results/{run_id}/dorado_trim/{barcode}_trim.fa")
     conda:
         "../envs/chimera_filtering.yaml"
     
     shell:"""
-        vsearch --fastq_filter {input.trim_reads} \
+        vsearch --fastq_filter {input.trimmed_reads} \
             --fastaout {output.trimmed_reads_fa} \
             --fastq_qmax 93 \
             --fastq_maxee 1.0
@@ -39,7 +39,7 @@ rule chimera_filtering:
 rule fa2fq:
     input:
         chim_filt_reads = "results/{run_id}/chimera_filtering/{barcode}_nochim.fa",
-        trimmed_reads = "results/{run_id}/dorado_trim/{barcode}_trim.fastq.gz"
+        trimmed_reads = "results/{run_id}/trimming/{barcode}_trim.fastq"
     output:
         chim_filt_reads_fq = "results/{run_id}/chimera_filtering/{barcode}_nochim.fastq.gz"
     conda:

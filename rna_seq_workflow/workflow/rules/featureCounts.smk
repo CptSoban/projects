@@ -9,6 +9,8 @@ rule featureCounts:
     params:
         strandness = config["Strandness"][1]
     
+    threads: config["threads"]
+    
     conda:
         "../envs/featureCounts.yaml"
 

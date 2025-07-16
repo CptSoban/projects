@@ -6,9 +6,31 @@ min_version("8.11.3")
 
 configfile: "config/config.yaml"
 
-# Define the samples
+# # Define the samples
+# def get_wildcards():
+    
+#     rna_directory = Path(config["rna_reads_directory"])
+
+#     for file in rna_directory.glob("*.fastq.gz"):
+#         if "_R1" in file.name or "_R2" in file.name:
+#             # Replace _R1 and _R2 with _1 and _2
+#             new_name = file.name.replace("_R1", "_1").replace("_R2", "_2")
+#             # Rename the file
+#             new_path = file.rename(file.with_name(new_name))
+#             # Check if the new file already exists
+#             if not new_path.exists():
+#                 print(f"Renaming: {file.name} to {new_name}")
+#                 file.rename(new_path)
+#         else:
+#             print(f"Skipping file {file.name} as it does not match the expected pattern.")
+            
+            
+#     SAMPLES = glob_wildcards(config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz")       
+#     return SAMPLES
+
 SAMPLES = glob_wildcards(config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz")
-ASSEMBLY_BASE = Path(config["genome_assembly"]).stem
+
+ASSEMBLY_FILE = Path(config["genome_assembly"]).name
 
 RUN_ID = config["Run ID"]
 
@@ -26,6 +48,8 @@ rule all:
 include:    "rules/repeatmasker.smk"
 
 if config["rna_reads_directory"]:
+    include:    "rules/hisat2_index.smk"
+    include:    "rules/hisat2_align.smk"
     include:    "rules/BRAKER3.smk"
 elif config["SRA_accession"]:
     include:    "rules/BRAKER3_SRA.smk"
