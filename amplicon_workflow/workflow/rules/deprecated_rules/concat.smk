@@ -1,28 +1,28 @@
 rule fastcat:
-    input:
-        reads = lambda wildcards: expand(config['reads_dir']+"/{barcode}/{sample}.fastq.gz", barcode=wildcards.barcode, sample=samples_per_barcode[wildcards.barcode]),
     output:
-        concat_trimm_reads = temp("results/{run_id}/trimming/{barcode}_trim.fastq"),
-        reports = directory("reports/{run_id}/{barcode}_fastcat.log"),
+        concat_filt_reads = "results/{run_id}/filtering/{barcode}_filt.fastq",
+        
     params:
-        reads_dir = config["reads_dir"]+"/{barcode}",
+        reports = directory("reports/{run_id}/{barcode}"),
+        reads_dir = config["demultiplexed_reads"]+"/{barcode}",
         min_length = config["min_length"],
         max_length = config["max_length"],
         min_quality = config["min_quality"],
-        
-
-    conda:
-        "../envs/trim.yaml"
     
-    shell:  """
-            fastcat \
-                -a {params.min_length} \
-                -b {params.max_length} \
-                --min_qscore={params.min_quality} \
-                --histograms={output.reports} \
-                {params.reads_dir} \
-                > {output.concat_trimm_reads} \
-            """
+    conda:
+        "../envs/concat_filt.yaml"
+
+    shell: """
+        fastcat \
+            -a {params.min_length} \
+            -b {params.max_length} \
+            --min_qscore {params.min_quality} \
+            --histograms {params.reports} \
+            {params.reads_dir} \
+            > {output.concat_filt_reads}
+    """
+
+
 
 # rule dorado_exists:
 #     output: touch("command_available.txt")

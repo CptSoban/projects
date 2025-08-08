@@ -4,41 +4,40 @@
 
 ### General Settings ###
 
-# Threads for parallel processing (Don't run in parallel or during basecalling/sequencing)
-threads: 20 # Maximum is 20
+# Threads for parallel processing (Max=30)
+threads: 8 # Not higher than 8 if other computational intensive systems (e.g., basecalling) are running
 
 # Run ID for the analysis
-run_id: Ethephon_pmoA
+run_id: pmoA_test
 
 # Demultiplexed reads directory
-demultiplexed_reads: /mnt/d/MinKNOW/experiments/Ethephon_project_pmoA_21-35_61-74/pmoA_21-35_61-74/20250722_1134_MN45285_FBC80869_e939cedf/pod5/duplex_basecalled/fastq
+demultiplexed_reads: /mnt/d/MinKNOW/experiments/Ethephon_project_pmoA_21-35_61-74/pmoA_21-35_61-74/20250722_1134_MN45285_FBC80869_e939cedf/fastq_pass
 
 ### Concat and Filter ###
 
 # Minimum and maximum length of reads to keep
-min_length: 450
-max_length: 650
+min_length: 500
+max_length: 550
 # Minimum quality score for filtering (10 = 10% error rate, 20 = 1% error rate)
 min_quality: 20
 
 
 # Chimera filtering settings
-# Clustering threshold should be set according to the minimal quality score of the reads.
-# Otherwise, basecalling errors can lead to false clustering.
 cluster_threshold: 0.99  # Threshold for clustering reads (0.97 = 97% similarity)
 
 
 ### Emu classification ###
 
-taxonomic_rank: genus  # Options: "species", "genus", "family", "order", "class", "phylum", "superkingdom"
+taxonomic_rank: species  # Options: "species", "genus", "family", "order", "class", "phylum", "superkingdom"
 
-# Path to the reference database 
+# Path to the reference default database or prebuilt custom database
 # Note that some prebuild alternative databases (e.g. SILVA) are available through the emu repository (https://osf.io/56uf7/files/osfstorage).
-# A custom database folder should contain sequences.fasta, taxonomy.tsv (sequence id to lineage mapping). 
+# The custom database folder should contain sequences.fasta, taxonomy.tsv (sequence id to taxid mapping) and species_taxid.tsv (taxid to lineage mapping)). 
 # See /home/nanopore/projects/amplicon_workflow/resources/custom_dbs/pr2_510_emu/ for an example.
 reference_db: /home/nanopore/projects/amplicon_workflow/resources/custom_dbs/gfz_pmoa
 
-# Minimal relative abundance of a taxon to be included in the final report (0.01 = 1% of reads)
+
+# Minimal relative abundance of a taxon to be included in the final report (0.01 = 1% abundance)
 min_abundance: 0.001
 
 

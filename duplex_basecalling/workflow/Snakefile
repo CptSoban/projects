@@ -1,0 +1,33 @@
+from snakemake.utils import min_version
+# Check if the version of snakemake is at least 8.11.3
+min_version("8.11.3")
+import os
+
+# Load the configuration file
+configfile: "config/config.yaml"
+
+def demux_filenames(wildcards):
+    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output[0]
+    BARCODE, = glob_wildcards(os.path.join(checkpoint_output, "{barcode}.fastq.gz"))
+    return expand(
+        os.path.join(checkpoint_output, "{barcode}.fastq.gz"),
+        barcode=BARCODE
+    )
+
+# Define the rule to generate the final output
+rule all:
+    input:
+        demux_filenames
+
+
+# Include the rules for the workflow
+include:    "rules/duplex_basecalling.smk"
+#include:    "rules/nanoplot.smk"
+
+
+
+
+
+
+
+

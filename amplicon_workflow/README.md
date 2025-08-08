@@ -1,26 +1,35 @@
-Amplicon Workflow Information 
+Amplicon Analyis Workflow Information 
 
-This workflow is designed to process amplicon sequencing data from MinION runs.
+This workflow is designed to taxonomically classify amplicons (e.g. full-length 16S rRNA gene).
+You have to run the duplex_basecalling workflow before starting this one!
 
-It includes steps for:  Concatenation, length and quality filtering (fastcat v0.22.0),  
-                        Chimera removal (vsearch v2.30.0), 
-                        Taxonomic classification using emu (emu v3.5.1)
+It includes steps for:  - Quality and length filtering (chopper v0.10.0)
+                        - Dereplication (vsearch v2.30.0)
+                        - Clustering (vsearch)
+                        - Chimera filtering (vsearch)
+                        - Rereplication 
+                        - Taxonomic classification (Emu v3.5.1)
+                        
+Note: Trimming of barcodes and sequencing adapter is usually already performed by MinKnow/dorado. If not visit https://github.com/nanoporetech/dorado for the necessary commands (dorado trim).
+Trimming of PCR primers can be run manually after the duplex_basecalling pipeline. However, it is not a requisite as the aligner utilized here (minimap2) would automatically soft-clip these regions anyway.
 
-Regarding Primer trimming: When setting up the sequencing run through MinKNOW it is highly recommended to activate the option to trim adapter sequences during basecalling. Trimming of PCR-Primer sequences is possible but will have virtually no effect on classification results, since modern aligners like minimap2 will "soft-clip" these sequences during alignment.
+1.  Fill in the fields in the config/config.yaml with your information and save it as {NAME}.yaml.
 
-1.  Activate the snakemake conda activate:
+2.  Move to the directory amplicon_workflow/
+
+3.  Activate the snakemake environment:
 
     conda activate snakemake
-
-2.  Fill in the fields in the config.yaml with your information and save the file as config.yaml in the directory projects/amplicon_workflow/config/.
-    You can keep a copy of your config file in config/old_configs for reference.
     
-3.  To test the workflow, perform a dry run with the command in projects/amplicon_workflow/:
+4.  To test the worfklow, perform a dry run with the command:
 
     snakemake -np
 
-4.  To run the workflow, use the command in projects/amplicon_workflow/:
+5.  To run the workflow, use the command:
 
     snakemake --use-conda --conda-frontend conda --cores all
+
+6. If the workflow is stopped you can restart it:
+
+    snakemake --use-conda --conda-frontend conda --cores all --rerun-incomplete
     
-    Only use --cores all if only one workflow is running. If multiple workflows or other computational intensive systems (sequencing) are running, specify the number of cores to use (e.g., --cores 20 (max. 32)).

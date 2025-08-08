@@ -2,4 +2,4 @@ channels:
  - conda-forge
  - bioconda
 dependencies:
-- emu=3.5.1
+- vsearch=2.30.0
