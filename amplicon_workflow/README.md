@@ -1,7 +1,7 @@
 Amplicon Analyis Workflow Information 
 
 This workflow is designed to taxonomically classify amplicons (e.g. full-length 16S rRNA gene).
-You have to run the duplex_basecalling workflow before starting this one!
+If you want to analyze duplex basecalled reads, run the duplex_basecalling workflow beforehand.
 
 It includes steps for:  - Quality and length filtering (chopper v0.10.0)
                         - Dereplication (vsearch v2.30.0)

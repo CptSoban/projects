@@ -1,5 +1,5 @@
 ### CONFIG FILE FOR AMPLICON WORKFLOW ###
-# This is a sample configuration file. Adjust the paths and parameters as needed.
+# This is a sample coNadine_SaKaLenfiguration file. Adjust the paths and parameters as needed.
 
 
 ### General Settings ###
@@ -8,16 +8,16 @@
 threads: 20 # Maximum is 20
 
 # Run ID for the analysis
-run_id: Nadine_SaKaLe
+run_id: Ethephon_mcrA
 
 # Directory of basecalled and demultiplexed reads
-demultiplexed_reads: /mnt/d/MinKNOW/experiments/20250915_NympheSaKaLe/Nadine1/20250915_1211_MN45285_FBD34569_7fa727b7/pod5duplex_basecalled/fastq
+demultiplexed_reads: /mnt/d/MinKNOW/experiments/Ethephon_project_mcrA_cDNA_1-10_41-50/mcrA_cDNA_1-10_41-50/20250926_1227_MN45285_FBD11961_601a669d/pod5duplex_basecalled/fastq
 
 ### Concat and Filter ###
 
 # Minimum and maximum length of reads to keep
-min_length: 1350
-max_length: 1650
+min_length: 450
+max_length: 650
 # Minimum quality score for filtering (10 = 10% error rate, 20 = 1% error rate)
 min_quality: 20
 
@@ -27,24 +27,19 @@ min_quality: 20
 # Otherwise, basecalling errors can lead to false clustering.
 cluster_threshold: 0.99  # Threshold for clustering reads (0.97 = 97% similarity)
 
-# Choice of classification tool: "emu" or "kraken2"
-classification_tool: emu
 
-### Emu parameters ###
+### Emu classification ###
 
-taxonomic_rank: species  # Options: "species", "genus", "family", "order", "class", "phylum", "superkingdom"
+taxonomic_rank: genus  # Options: "species", "genus", "family", "order", "class", "phylum", "superkingdom"
 
 # Path to the reference database 
 # Note that some prebuild alternative databases (e.g. SILVA) are available through the emu repository (https://osf.io/56uf7/files/osfstorage).
 # A custom database folder should contain sequences.fasta, taxonomy.tsv (sequence id to lineage mapping). 
 # See /home/nanopore/projects/amplicon_workflow/resources/custom_dbs/pr2_510_emu/ for an example.
-reference_db: /home/nanopore/projects/amplicon_workflow/resources/custom_dbs/pr2_510_emu/
+reference_db: /home/nanopore/projects/amplicon_workflow/resources/custom_dbs/gfz_mcra
 
 # Minimal relative abundance of a taxon to be included in the final report (0.01 = 1% of reads)
-min_abundance: 0.0001
-
-### KRAKEN2 classification ###
-
+min_abundance: 0.001
 
 
 # PCR primer sequences to trim from the reads in fasta format (header form: [id]_front/rear type=primer) (OPTIONAL)
