@@ -1,13 +1,10 @@
 rule interpro_annotation:
     input:
-        first_results = "results/DEG_analysis/{run_id}/{contrast}/main_{run_id}_{contrast}.csv",
-        interpro_gff = "resources/{run_id}/{run_id}_{contrast}_interpro_results_db"
+        first_results = "results/{run_id}/DEG_analysis/trimmed/trim_{contrast}.csv",
+        interpro_gff = "resources/{run_id}/interpro_results_db"
 
     output:
-        annotated_results = "results/functional_annotations/interproscan/{run_id}/{contrast}/{run_id}_{contrast}_interpro_annotations.csv",
-
-    threads:
-        config["threads"]
+        annotated_results = "results/{run_id}/functional_annotations/interproscan/{contrast}_interpro_annotations.csv",
 
     conda:
         "../envs/annotation_integration.yaml"

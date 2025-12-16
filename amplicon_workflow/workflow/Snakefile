@@ -1,0 +1,57 @@
+from snakemake.utils import min_version
+# Check if the version of snakemake is at least 8.11.3
+min_version("8.11.3")
+
+# Load the configuration file
+configfile: "config/config.yaml"
+
+# Define wildcards for barcodes and samples
+SAMPLES = glob_wildcards(config["demultiplexed_reads"]+"/{barcode}.fastq.gz")
+
+
+# Define the run ID
+RUN_ID = config["run_id"]
+
+# Define the final output files
+def get_final_output():
+    # Check if samples are detected
+    if not SAMPLES:
+        raise ValueError("No samples detected. Check 'demultiplexed_reads' in config file.")
+
+    final_output = [
+        # Add chimera filtered fastq files to final output
+        expand("results/{run_id}/chimera_filtering/{barcode}_nochim.fasta",
+                run_id=RUN_ID, barcode=SAMPLES.barcode),
+    ]
+   
+
+    final_output.extend([
+        # Add combined classification file to final output
+        f"results/{RUN_ID}/emu/emu-combined-{config["taxonomic_rank"]}.tsv",
+    ])
+
+    return final_output
+
+# Define the rule to generate the final output
+rule all:
+    input:
+        get_final_output()
+
+
+# Include the rules for the workflow
+include:    "rules/01_general_filtering.smk"
+include:    "rules/02_dereplication.smk"
+include:    "rules/03_clustering.smk"
+include:    "rules/04_chimera_filtering_denovo.smk"
+include:    "rules/05_fa2fq.smk"
+include:    "rules/06_classification.smk"
+# include:    "rules/polish.smk"
+
+
+
+
+
+
+
+
+

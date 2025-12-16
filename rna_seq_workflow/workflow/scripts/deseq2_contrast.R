@@ -1,12 +1,14 @@
 library(DESeq2)
 library(tidyverse)
 
-#Contrasting conditions info
-contrast_info <- read.csv(snakemake@input[["contrast"]])
 
+# Get the contrast pair
+contrast_pair <- snakemake@params[["contrast_pair"]]
+
+# Read in DESeq2 dataset
 dds <- readRDS(snakemake@input[["deseq_dataset"]])
 
-#Convert signficant (padj = 0.05) results to dataframe
+# Function to perform differential expression analysis for given treatment and control
 contrast_conditions <- function(treatment, control){
     res <- data.frame(results(dds, contrast = c("condition",
                                         treatment,
@@ -18,18 +20,11 @@ contrast_conditions <- function(treatment, control){
     res <- res[order(res$log2FoldChange,
                             decreasing = TRUE,
                             na.last = TRUE), ]
+    return(res)
 }
 
-for (pair in seq_len(nrow(contrast_info))) {
-    pair_vector <- as.character(contrast_info[pair,])
-    conc_pairs <- paste(pair_vector, collapse = "_vs_")
-    contrast_res <- contrast_conditions(pair_vector[1], pair_vector[2])
-    write.csv(contrast_res, gsub(" ", "",
-                            paste("results/DEG_analysis/",
-                                    snakemake@params[["run_id"]],
-                                    "/",
-                                    snakemake@params[["run_id"]],
-                                    "_",
-                                    conc_pairs,
-                                    ".csv")))
-}
+# Perform analysis
+contrast_res <- contrast_conditions(contrast_pair[1], contrast_pair[2])
+
+# Write results to the specified output file
+write.csv(contrast_res, snakemake@output[["mod_deg_table"]], row.names = FALSE)

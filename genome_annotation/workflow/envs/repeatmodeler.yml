@@ -1,0 +1,7 @@
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - repeatmodeler=2.0.6
+ - ltr_retriever=3.0.2
+ - mafft=7.525

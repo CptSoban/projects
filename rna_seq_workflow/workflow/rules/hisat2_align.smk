@@ -1,26 +1,27 @@
 rule hisat2_align:
     input:
-        r1 = "results/cutadapt/{run_id}/trim_{sample}_R1.fastq.gz" if config["Trimming"] == "yes" else config["seq_dir"]+"/{sample}_R1.fastq.gz",
-        r2 = "results/cutadapt/{run_id}/trim_{sample}_R2.fastq.gz" if config["Trimming"] == "yes" else config["seq_dir"]+"/{sample}_R2.fastq.gz",
-        index_files = "results/hisat2_index/{run_id}/{run_id}.1.ht2"
+        r1 = config["seq_dir"]+"/{sample}_1.fastq.gz",
+        r2 = config["seq_dir"]+"/{sample}_2.fastq.gz",
+        index_files = "results/{run_id}/hisat2_index/{run_id}.1.ht2",
+        fastqc_output = expand("results/{run_id}/fastqc/{sample}_{group}_fastqc.html", run_id=RUN_ID, sample=set(SAMPLES.sample), group=set(SAMPLES.group))
     output:
-        bam_file = "results/hisat2_align/{run_id}/{sample}.sortedByCoord.out.bam"
+        bam_file = "results/{run_id}/hisat2_align/{sample}.sortedByCoord.out.bam"
 
     log:
-        summary = "reports/hisat2_align/{run_id}/{sample}_summary.log",
-        metrics = "reports/hisat2_align/{run_id}/{sample}_metrics.log"
+        summary = "reports/{run_id}/hisat2_align/{sample}_summary.log",
+        metrics = "reports/{run_id}/hisat2_align/{sample}_metrics.log"
 
     params:
-        basename = "results/hisat2_index/{run_id}/{run_id}",
+        basename = "results/{run_id}/hisat2_index/{run_id}",
         strandness = config["Strandness"][0]
-    threads:
-        config["threads"]
+    
+    threads: config["threads"]
 
     conda:
         "../envs/hisat2.yaml"
 
-    shell:  """hisat2 -p {threads} \
-            -x {params.basename} \
+    shell:  """hisat2 -x {params.basename} \
+            -p {threads} \
             -1 {input.r1} \
             -2 {input.r2} \
             --rna-strandness {params.strandness} \

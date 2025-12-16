@@ -7,15 +7,6 @@ mod_res <- read.csv(snakemake@input[["mod_deg_table"]])
 
 top_over <- head(mod_res$log2FoldChange, 5)
 
-#top_under <- tail(mod_res[order(mod_res$log2FC_shrinked), ], 10)
-
-#lab_italics <- paste0("italic('", rownames(mod_res), "')")
-# selectLab_italics <- paste0(
-#     "italic('",
-#     c('FOXG_12350', 'FOXG_03770', 'FOXG_09804', 'FOXG_20229', 'FOXG_11545'),
-#     "')")
-#Top ranked DeSeq2 results
-# top_res <- c('FOXG_12350', 'FOXG_03770', 'FOXG_09804', 'FOXG_20229', 'FOXG_11545')
 
 #VOLCANO PLOT
 
@@ -24,8 +15,7 @@ pdf(snakemake@output[["volcano_plot"]])
 EnhancedVolcano(mod_res,
                 x = "log2FoldChange",
                 y = "padj",
-                lab = mod_res$symbol,
-                #selectLab = top_res,
+                lab = rep('', nrow(mod_res)),
                 pCutoff = 0.05,
                 FCcutoff = 2,
                 pointSize = 3.0,

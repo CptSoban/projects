@@ -1,0 +1,10 @@
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - python=3.10.6
+ - gseapy=1.1.4
+ - pandas=2.2.3
+ - numpy=2.2.1
+ - matplotlib=3.10.0
+ - seaborn=0.13.2

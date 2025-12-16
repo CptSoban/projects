@@ -7,16 +7,18 @@ library(apeglm)
 counts_data <- read.csv(snakemake@input[["prep_counts_table"]])
 
 #Sample info
-sample_info <- read.csv(snakemake@input[["sample_info"]], sep = "\t")
+sample_info <- read.csv(snakemake@input[["sample_info"]])
 
 #Converst first column to rownames
 counts_data <- column_to_rownames(counts_data, var = "Geneid")
+
+sample_info$condition <- factor(sample_info$condition)
 
 
 #Builds DESeq2 dataset from count table and sample info
 dds <- DESeqDataSetFromMatrix(countData = counts_data,
                                 colData = sample_info,
-                                design = ~condition)
+                                design = ~ condition)
 
 #Sets control samples as "baseline" to compare the treated samples against
 # dds$condition <- relevel(dds$condition, ref = "control")
