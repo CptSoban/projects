@@ -1,0 +1,31 @@
+import os
+import glob
+from pathlib import Path
+from snakemake.utils import min_version
+min_version("8.11.3")
+
+configfile: "config/config.yaml"
+
+SAMPLES = glob_wildcards(config["rna_reads_directory"]+"/{sample}_{group}.fastq.gz")
+
+ASSEMBLY_FILE = Path(config["genome_assembly"]).name
+
+RUN_ID = config["Run ID"]
+
+def get_final_output():
+    final_output = expand(
+        "results/{run_id}/braker/braker.gtf", run_id=RUN_ID
+    )
+    final_output.append(expand("results/{run_id}/braker/braker.aa", run_id=RUN_ID))
+    return final_output
+
+rule all:
+    input:
+        get_final_output()
+
+include:    "rules/repeatmodeler.smk"
+
+
+
+
+

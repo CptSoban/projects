@@ -4,7 +4,6 @@
 /genome_annotation/temp/
 /genome_annotation/.snakemake/
 
-/genome_assembly/
 
 /metagenome_assembly/resources/
 /metagenome_assembly/results/
