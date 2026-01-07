@@ -79,7 +79,6 @@ def get_final_output():
             expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_plot_pathways.png", run_id=RUN_ID, contrast=CONTRAST),
             expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_results_modules.csv", run_id=RUN_ID, contrast=CONTRAST),
             expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_plot_modules.png", run_id=RUN_ID, contrast=CONTRAST),
-            # expand("results/{run_id}/enrichment_analysis/fisher_exact/{contrast}_forest_plot.png", run_id=RUN_ID, contrast=CONTRAST),
         ])
     
     return final_output
@@ -126,7 +125,6 @@ if config["eggnog_results"] and config["enrichment_analysis"] == "yes":
     include:    "rules/gsea.smk"
 else:
     print("Skipping enrichment analysis...")
-    # include:    "rules/fisher_exact_test.smk"
 
 
 
