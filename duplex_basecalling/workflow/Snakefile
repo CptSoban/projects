@@ -6,6 +6,7 @@ import os
 # Load the configuration file
 configfile: "config/config.yaml"
 
+
 def demux_filenames(wildcards):
     checkpoint_output = checkpoints.demultiplex.get(**wildcards).output[0]
     BARCODE, = glob_wildcards(os.path.join(checkpoint_output, "{barcode}.fastq.gz"))
@@ -20,8 +21,11 @@ rule all:
         demux_filenames
 
 
-# Include the rules for the workflow
-include:    "rules/duplex_basecalling.smk"
+# Rules included 
+include:    "rules/01_duplex_basecalling.smk"
+
+if config["multiplex"] == True:
+    include:    "rules/02_demultiplex.smk"
 #include:    "rules/nanoplot.smk"
 
 
