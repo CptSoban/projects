@@ -26,6 +26,8 @@ include:    "rules/01_duplex_basecalling.smk"
 
 if config["multiplex"] == True:
     include:    "rules/02_demultiplex.smk"
+else:
+    include:    "rules/02_bam2fq.smk"
 #include:    "rules/nanoplot.smk"
 
 
