@@ -23,7 +23,8 @@ rule all:
     input:
         get_final_output()
 
-include:    "rules/repeatmodeler.smk"
+include:    "rules/flye.smk"
+include:    "rules/busco.smk"
 
 
 
