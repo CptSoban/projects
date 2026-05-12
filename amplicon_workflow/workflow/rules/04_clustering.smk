@@ -2,7 +2,7 @@ rule clustering:
     input:
         derep_fasta = "results/{run_id}/dereplication/{barcode}_derep.fa"
     output:
-        centroids = temp("results/{run_id}/clustering/{barcode}_centroids.fasta"),
+        centroids = "results/{run_id}/clustering/{barcode}_centroids.fasta",
     log:
         cluster_report = "reports/{run_id}/clustering/{barcode}_cluster_report.tsv"
     params:

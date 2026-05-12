@@ -3,3 +3,4 @@ channels:
  - bioconda
 dependencies:
 - chopper=0.10.0
+- cutadapt=5.2

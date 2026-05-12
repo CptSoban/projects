@@ -8,31 +8,26 @@
 threads: 20 # Maximum is 20
 
 # Run ID for the analysis
-run_id: 20260323_IGB_LWMS_Lena
+run_id: Ethephon_mcrA_new_DB_2026
 
 ### Basecalling and Demultiplexing ###
 
 # If basecalling and demultiplexing has already been performed, provide the path to the directory containing the basecalled and demultiplexed reads.
 # Directory of basecalled and demultiplexed reads
-pod5_dir: /mnt/d/MinKNOW/experiments/20260323_IGB_LWMS_Lena/no_sample_id/20260323_1134_MN45285_FBE96273_220d1d6e/pod5
+demultiplexed_reads: /mnt/d/MinKNOW/experiments/Ethephon_project_mcrA_cDNA_1-10_41-50/mcrA_cDNA_1-10_41-50/20250926_1227_MN45285_FBD11961_601a669d/pod5duplex_basecalled/fastq
 
-# Kit name for basecalling and demultiplexing
-kit_name: SQK-NBD114-96 # e.g. Native Barcoding Kit 96 V14 = SQK-NBD114-96
-
-### Trim, Concat and Filter ###
-
-# PCR primer sequences (5'->3') to trim from the reads (no spaces)
-Forward_primer: AGRGTTYGATYMTGGCTCAG
-Reverse_primer: TACGGYTACCTTGTTACGACTT
+### Concat and Filter ###
 
 # Minimum and maximum length of reads to keep
-min_length: 1200
-max_length: 1600
+min_length: 400
+max_length: 600
 # Minimum quality score for filtering (10 = 10% error rate, 20 = 1% error rate)
 min_quality: 20
 
+
+# Chimera filtering settings
 # Clustering threshold should be set according to the minimal quality score of the reads.
-cluster_threshold: 0.99   # Threshold for clustering reads (0.97 = 97% similarity)
+cluster_threshold: 0.84   # Threshold for clustering reads (0.97 = 97% similarity)
 
 # Choice of classification tool: "emu"
 classification_tool: emu
@@ -43,10 +38,13 @@ taxonomic_rank: species   # Options: "species", "genus", "family", "order", "cla
 
 # Path to the reference database 
 # Some custom databases already exist locally (e.g. SILVA), check the resources/custom_dbs/ folder.
-reference_db: /home/nanopore/projects/amplicon_workflow/resources/custom_dbs/silva_v138.2
+reference_db: /home/nanopore/projects/amplicon_workflow/resources/custom_dbs/mcra_2026
 
 # Minimal relative abundance of a taxon to be included in the final report (0.01 = 1% of reads)
 min_abundance: 0.001
+
+
+
 
 
 ### UNDER CONSTRUCTION ###
@@ -55,3 +53,6 @@ min_abundance: 0.001
 ### KRAKEN2 classification ###
 
 
+
+# PCR primer sequences to trim from the reads in fasta format (header form: [id]_front/rear type=primer) (OPTIONAL)
+#primer_fasta: "/home/nanopore/projects/amplicon_workflow/resources/primer_seq/27F_1492R.fa"

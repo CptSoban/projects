@@ -1,52 +1,201 @@
 from snakemake.utils import min_version
-# Check if the version of snakemake is at least 8.11.3
+from snakemake.io import glob_wildcards
+import os
+
+# Require minimum Snakemake version
 min_version("8.11.3")
 
-# Load the configuration file
+# Load config
 configfile: "config/config.yaml"
 
-# Define wildcards for barcodes and samples
-SAMPLES = glob_wildcards(config["demultiplexed_reads"]+"/{barcode}.fastq.gz")
-
-
-# Define the run ID
+# Global variables
 RUN_ID = config["run_id"]
 
-# Define the final output files
-def get_final_output():
-    # Check if samples are detected
-    if not SAMPLES:
-        raise ValueError("No samples detected. Check 'demultiplexed_reads' in config file.")
 
-    final_output = [
-        # Add chimera filtered fastq files to final output
-        expand("results/{run_id}/chimera_filtering/{barcode}_nochim.fasta",
-                run_id=RUN_ID, barcode=SAMPLES.barcode),
-    ]
-   
+############################################################
+# CHECKPOINT-BASED BARCODE DISCOVERY
+############################################################
 
-    final_output.extend([
-        # Add combined classification file to final output
-        f"results/{RUN_ID}/emu/emu-combined-{config["taxonomic_rank"]}.tsv",
-    ])
+def get_barcodes():
+    """
+    Discover barcode names after demultiplex checkpoint finishes.
+    Example output:
+        ["barcode01", "barcode02", ...]
+    """
+    ckpt = checkpoints.demultiplex.get()
 
-    return final_output
+    demux_dir = ckpt.output.output_dir
 
-# Define the rule to generate the final output
+    return glob_wildcards(
+        os.path.join(demux_dir, "{barcode}.fastq.gz")
+    ).barcode
+
+
+def demux_filename(wildcards):
+    """
+    Return full paths to demultiplexed FASTQ files.
+    """
+    ckpt = checkpoints.demultiplex.get()
+
+    demux_dir = ckpt.output.output_dir
+    barcodes = get_barcodes()
+
+    return os.path.join(demux_dir, f"{wildcards.barcode}.fastq.gz")
+
+############################################################
+# FINAL TARGETS
+############################################################
+
+def get_final_output(wildcards):
+    """
+    Dynamic final outputs depending on discovered barcodes.
+    """
+    barcodes = get_barcodes()
+
+    return (
+            # expand(
+            #     "results/{run_id}/filtering/{barcode}_trim.fastq",
+            #     run_id=RUN_ID,
+            #     barcode=barcodes
+            # )
+            # +
+            #  expand(
+            #     "results/{run_id}/filtering/{barcode}_filt.fastq.gz",
+            #     run_id=RUN_ID,
+            #     barcode=barcodes
+            # )
+        expand(
+            "results/{run_id}/clustering/{barcode}_centroids.fasta",
+            run_id=RUN_ID,
+            barcode=barcodes
+        )
+        +
+        expand(
+            "results/{run_id}/chimera_filtering/{barcode}_nochim.fasta",
+            run_id=RUN_ID,
+            barcode=barcodes
+        )
+        +
+        [
+            f"results/{RUN_ID}/emu/emu-combined-{config['taxonomic_rank']}.tsv"
+        ]
+    )
+
+
 rule all:
     input:
-        get_final_output()
+        get_final_output
 
 
-# Include the rules for the workflow
-include:    "rules/01_general_filtering.smk"
-include:    "rules/02_dereplication.smk"
-include:    "rules/03_clustering.smk"
-include:    "rules/04_chimera_filtering_denovo.smk"
-include:    "rules/05_fa2fq.smk"
-include:    "rules/06_classification.smk"
-# include:    "rules/polish.smk"
+############################################################
+# INCLUDE WORKFLOW MODULES
+############################################################
 
+include: "rules/01_simplex_basecalling.smk"
+include: "rules/02_general_filtering.smk"
+include: "rules/03_dereplication.smk"
+include: "rules/04_clustering.smk"
+include: "rules/05_chimera_filtering_denovo.smk"
+include: "rules/06_fa2fq.smk"
+include: "rules/07_classification.smk"
+
+
+# from snakemake.utils import min_version
+# import os
+# from snakemake.io import glob_wildcards
+# # Check if the version of snakemake is at least 8.11.3
+# min_version("8.11.3")
+
+# # Load the configuration file
+# configfile: "config/config.yaml"
+
+# # Define wildcards for barcodes and samples
+# # SAMPLES = glob_wildcards(config["demultiplexed_reads"]+"/{barcode}.fastq.gz")
+
+# # Define the run ID
+# RUN_ID = config["run_id"]
+
+# import os
+# from snakemake.io import glob_wildcards
+
+# def get_barcodes():
+#     ckpt = checkpoints.demultiplex.get()
+
+#     demux_dir = ckpt.output.output_dir
+
+#     return glob_wildcards(
+#         os.path.join(demux_dir, "{barcode}.fastq.gz")
+#     ).barcode
+
+# def get_final_output(wildcards):
+#     barcodes = get_barcodes()
+
+#     return (
+#         expand(
+#             "results/{run_id}/clustering/{barcode}_centroids.fasta",
+#             run_id=RUN_ID,
+#             barcode=barcodes
+#         )
+#         +
+#         expand(
+#             "results/{run_id}/chimera_filtering/{barcode}_nochim.fasta",
+#             run_id=RUN_ID,
+#             barcode=barcodes
+#         )
+#         +
+#         [
+#             f"results/{RUN_ID}/emu/emu-combined-{config['taxonomic_rank']}.tsv"
+#         ]
+#     )
+# # # Function to get demultiplexed filenames from the checkpoint
+# # def demux_filenames(wildcards):
+# #     # Get the output directory from the demultiplex checkpoint
+# #     checkpoint_output = checkpoints.demultiplex.get(**wildcards).output[0]
+# #     # Use glob_wildcards to find all barcoded FASTQ files in the output directory
+# #     BARCODE, = glob_wildcards(os.path.join(checkpoint_output, "{barcode}.fastq.gz"))
+# #     # Expand the list of barcoded FASTQ files to return their full paths
+# #     return expand(
+# #         os.path.join(checkpoint_output, "{barcode}.fastq.gz"),
+# #         barcode=BARCODE
+# #     )
+
+# # # Define the final output files
+# # def get_final_output():
+
+# #     final_output = [
+# #         # Add clustering centroids to final output
+# #         expand("results/{run_id}/clustering/{barcode}_centroids.fasta",
+# #                 run_id=RUN_ID, barcode=SAMPLES.barcode),
+# #     ]
+
+# #     final_output.extend([
+# #         # Add chimera filtered fastq files to final output
+# #         expand("results/{run_id}/chimera_filtering/{barcode}_nochim.fasta",
+# #                 run_id=RUN_ID, barcode=SAMPLES.barcode),
+# #     ])
+   
+
+# #     final_output.extend([
+# #         # Add combined classification file to final output
+# #         f"results/{RUN_ID}/emu/emu-combined-{config['taxonomic_rank']}.tsv",
+# #     ])
+
+# #     return final_output
+
+# # Define the rule to generate the final output
+# rule all:
+#     input:
+#         get_final_output()
+
+
+# # Include the rules for the workflow
+# include:    "rules/01_simplex_basecalling.smk"
+# include:    "rules/02_general_filtering.smk"
+# include:    "rules/03_dereplication.smk"
+# include:    "rules/04_clustering.smk"
+# include:    "rules/05_chimera_filtering_denovo.smk"
+# include:    "rules/06_fa2fq.smk"
+# include:    "rules/07_classification.smk"
 
 
 

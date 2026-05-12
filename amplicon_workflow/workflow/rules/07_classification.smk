@@ -26,10 +26,20 @@ rule emu_classify:
             --type {params.seq_type} \
             --threads {threads}
         """
-    
+
+
+def emu_inputs(wildcards):
+    barcodes = get_barcodes()
+
+    return expand(
+        "results/{run_id}/emu/{barcode}_rel-abundance.tsv",
+        run_id=wildcards.run_id,
+        barcode=barcodes
+    )
+
 rule emu_combine:
     input:
-        rel_abundance = expand("results/{run_id}/emu/{barcode}_rel-abundance.tsv", run_id=RUN_ID, barcode=SAMPLES.barcode),
+        rel_abundance = emu_inputs,
         
     output:
         combined_rel_abundance = "results/{run_id}/emu/emu-combined-"+config["taxonomic_rank"]+".tsv",
