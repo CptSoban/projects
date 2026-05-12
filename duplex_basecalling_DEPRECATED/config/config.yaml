@@ -1,0 +1,12 @@
+# DUPLEX basecalling workflow
+# This workflow is designed to perform duplex basecalling on nanopore sequencing data.
+
+# Path to the raw sequence data
+pod5_dir: /mnt/d/MinKNOW/experiments/20260323_IGB_LWMS_Lena/no_sample_id/20260323_1134_MN45285_FBE96273_220d1d6e/pod5
+
+kit_name: SQK-NBD114-96 # e.g. Native Barcoding Kit 96 V14 = SQK-NBD114-96
+
+multiplexed_kit: yes  # Set to yes if using multiplexed samples (barcoded)
+
+threads: 20  # Number of threads to use for processing (maximum is 20)
+

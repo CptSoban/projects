@@ -1,0 +1,42 @@
+from snakemake.utils import min_version
+# Check if the version of snakemake is at least 8.11.3
+min_version("8.11.3")
+import os
+
+# Load the configuration file
+configfile: "config/config.yaml"
+
+# Function to get demultiplexed filenames from the checkpoint
+def demux_filenames(wildcards):
+    # Get the output directory from the demultiplex checkpoint
+    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output[0]
+    # Use glob_wildcards to find all barcoded FASTQ files in the output directory
+    BARCODE, = glob_wildcards(os.path.join(checkpoint_output, "{barcode}.fastq.gz"))
+    # Expand the list of barcoded FASTQ files to return their full paths
+    return expand(
+        os.path.join(checkpoint_output, "{barcode}.fastq.gz"),
+        barcode=BARCODE
+    )
+
+# Define the rule to generate the final output
+rule all:
+    input:
+        demux_filenames
+
+
+# Rules included 
+include:    "rules/01_duplex_basecalling.smk"
+
+if config["multiplexed_kit"] == "yes":
+    include:    "rules/02_demultiplex.smk"
+else:
+    include:    "rules/02_bam2fq.smk"
+#include:    "rules/nanoplot.smk"
+
+
+
+
+
+
+
+
