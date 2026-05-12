@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from Bio import SeqIO
 import gffutils
 
@@ -16,11 +17,13 @@ all_genes_df = all_genes_df[["symbol", "log2FoldChange", "baseMean", "padj"]]
 #Remove any empthy rows
 all_genes_df.dropna(inplace = True)
 
-#Mask to filter lowly expressed genes
-filter_mask_baseMean = (all_genes_df["baseMean"] >= snakemake.params["base_mean_threshold"])
+#Filter lowly expressed genes
+most_DEG_df = all_genes_df.loc[all_genes_df["baseMean"] >= snakemake.params["base_mean_threshold"]]
 
-#Table containing significant DEGs and non-DEGs
-most_DEG_df = all_genes_df[filter_mask_baseMean]
+#Filter for most significant DEGs
+# most_DEG_df = most_DEG_df.loc[(most_DEG_df["padj"] <= 0.05) &
+#                               ((most_DEG_df["log2FoldChange"] >= 0.5) | (most_DEG_df["log2FoldChange"] <= -0.5))]
+
 
 #Annotates GTF product information to the created dataframe
 most_DEG_df = most_DEG_df.set_index("symbol")

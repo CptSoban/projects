@@ -9,7 +9,8 @@ rule gsea:
         gsea_plot_modules = "results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_plot_modules.png"
     
     params:
-        filter_terms = config["filter_terms"]
+        filter_terms = config["filter_terms"],
+        fdr_threshold = config["fdr_threshold"]
     
     log:
         recovery_log = "reports/{run_id}/enrichment_analysis/gsea/{contrast}_recovery.log"

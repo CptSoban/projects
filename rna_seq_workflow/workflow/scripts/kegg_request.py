@@ -3,16 +3,6 @@ import requests
 import json
 import time
 
-# Collect all unique KO IDs from input files
-input_files = snakemake.input["functional_annotations"]  # List of input files
-all_kos = set()
-
-for file in input_files:
-    df = pd.read_csv(file)
-    df['KEGG_ko'] = df['KEGG_ko'].str.split(',')
-    kos = df['KEGG_ko'].explode().str.strip().dropna()
-    all_kos.update(kos)
-
 # Query KEGG API for all unique KO IDs
 def fetch_kegg_data(all_kos):
     
@@ -60,15 +50,6 @@ def fetch_kegg_data(all_kos):
             print(f"Exception: {e}")
     return ids_cache
 
-# Fetch the pathway and module IDs for all unique KO IDs
-ko_data = fetch_kegg_data(all_kos)
-
-# Extract unique pathway IDs
-unique_pathway_ids = {pathway for pathways in ko_data.values() for pathway in pathways["pathway"]}
-
-# Extract unique module IDs
-unique_module_ids = {module for modules in ko_data.values() for module in modules["module"]}
-
 # Function to fetch names for pathways & modules
 def fetch_kegg_names(kegg_ids, category):
     """
@@ -101,6 +82,26 @@ def fetch_kegg_names(kegg_ids, category):
             print(f"Exception fetching {category} {kegg_id}: {e}")
 
     return names_cache
+
+# Collect all unique KO IDs from input files
+input_files = snakemake.input["functional_annotations"]  # List of input files
+all_kos = set()
+
+for file in input_files:
+    df = pd.read_csv(file)
+    df['KEGG_ko'] = df['KEGG_ko'].str.split(',')
+    kos = df['KEGG_ko'].explode().str.strip().dropna()
+    all_kos.update(kos)
+
+# Fetch the pathway and module IDs for all unique KO IDs
+ko_data = fetch_kegg_data(all_kos)
+
+# Extract unique pathway IDs
+unique_pathway_ids = {pathway for pathways in ko_data.values() for pathway in pathways["pathway"]}
+
+# Extract unique module IDs
+unique_module_ids = {module for modules in ko_data.values() for module in modules["module"]}
+
 
 # Fetch pathway and module names
 pathway_names_cache = fetch_kegg_names(unique_pathway_ids, "pathway")
