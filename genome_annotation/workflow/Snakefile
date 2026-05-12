@@ -45,6 +45,7 @@ rule all:
     input:
         get_final_output()
 
+include:    "rules/repeatmodeler.smk"
 include:    "rules/repeatmasker.smk"
 
 if config["rna_reads_directory"]:

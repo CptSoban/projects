@@ -4,27 +4,27 @@
 ### General settings ###
 
 # Run ID for the genome annotation (e.g. organism name)
-Run ID: clonostachys_rosea
+Run ID: apiotrichum_laibachii
 
 # Threads for parallel processing
-threads: 16 # For stability, calculate threads as 2x the available cores (max cores=8)
+threads: 10 
 
 ### Repeat masking, Alignment and Gene Prediction ###
 
 # Path to the genome assembly file
 # The fasta should NOT contain any whitespace in the header (shorten or replace with underscores with sed 's/ /_/g' $FASTA)
-genome_assembly: /home/nanopore/projects/simona/cloro_assembly/flye_assembly/clonostachys_rosea.fasta
+genome_assembly: /home/nanopore/projects/genome_assembly/results/assembly/assembly.fasta
 
 # DFAM taxon for repeat masking
-DFAM taxon: ascomycota
+# DFAM taxon: ascomycota
 
 # Path to the RNA reads directory (if using local RNA reads)
-rna_reads_directory : /home/nanopore/projects/rna_seq_workflow/resources/20250206_CLORO
+rna_reads_directory : /home/nanopore/projects/rna_seq_workflow/resources/20250528_APILAI
 #Strandness of RNA-seq reads ["",0] for Unstranded, ["FR",1] for Stranded or ["RF",2] for Reverse Stranded
 Strandness: ["RF",2]
 
 # SRA accession for RNA reads (Only applicable if not using local RNA reads)
-SRA_accession: 
+SRA_accession:
 
 ### WORK IN PROGRESS ###
 # Causes bug in BRAKER!

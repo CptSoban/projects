@@ -3,7 +3,7 @@ rule repeatmodeler:
         genome_assembly = config["genome_assembly"],
 
     output:
-        repeat_db = "resources/{run_id}/repeatmodeler/{run_id}-families.fa"
+        repeat_db = "results/{run_id}/repeatmodeler/{run_id}_DB-families.fa"
     
     params:
         run_id = RUN_ID,
@@ -13,5 +13,15 @@ rule repeatmodeler:
     conda:
         "../envs/repeatmodeler.yml"
 
-    shell: """BuildDatabase -name {run_id}_DB {input.genome_assembly} && \
-            RepeatModeler -database {run_id}_DB -threads {threads} -LTRStruct""" 
+    shell:  """
+            mkdir -p results/{wildcards.run_id}/repeatmodeler && \
+            BuildDatabase -name results/{wildcards.run_id}/repeatmodeler/{wildcards.run_id}_DB {input.genome_assembly} && \
+            RepeatModeler -database results/{wildcards.run_id}/repeatmodeler/{wildcards.run_id}_DB \
+              -threads {threads} \
+              -LTRStruct \
+"""
+
+#)"""BuildDatabase -name {wildcards.run_id}_DB {input.genome_assembly} && \
+ #           RepeatModeler -database {wildcards.run_id}_DB -threads {threads} -LTRStruct""" 
+
+ #              -dir results/{wildcards.run_id}/repeatmodeler

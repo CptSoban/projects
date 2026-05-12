@@ -11,12 +11,19 @@ rule build_braker3:
 
     shell:  """apptainer build --force resources/braker3.sif docker://teambraker/braker3:v3.0.7.6"""
 
+rule merge_bams:
+    input:
+        expand("results/{run_id}/hisat2_align/{sample}.sortedByCoord.out.bam", run_id=RUN_ID, sample=SAMPLES.sample)
+    output:
+        "results/{run_id}/hisat2_align/merged.bam"
+    
+    shell:  """samtools merge {output} {input}"""
+    
 rule BRAKER3:
     input:
-        rna_bams = ",".join(expand("results/{run_id}/hisat2_align/{sample}.sortedByCoord.out.bam", run_id=RUN_ID, sample=set(SAMPLES.sample))),
+        merged_bam = "results/{run_id}/hisat2_align/merged.bam",
         augustus_config = "resources/Augustus/config",
         masked_genome = "results/{run_id}/repeatmasker/"+ASSEMBLY_FILE+".masked",
-        rna_reads_dir = config["rna_reads_directory"],
         container_file = "resources/braker3.sif",
     output:
         braker_gtf = "results/{run_id}/braker/braker.gtf",
@@ -34,7 +41,7 @@ rule BRAKER3:
             {params.fungi} \
             --species={params.species_name} \
             --genome={input.masked_genome} \
-            --bam={input.rna_bams} \
+            --bam={input.merged_bam} \
             --workingdir={params.out_dir} \
             --AUGUSTUS_CONFIG_PATH=$(realpath {input.augustus_config}) \
             --threads={threads} 

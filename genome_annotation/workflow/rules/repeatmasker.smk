@@ -2,7 +2,7 @@
 rule repeatmasker:
     input:
         genome_assembly = config["genome_assembly"],
-        repeat_db = "resources/{run_id}/repeatmodeler/{run_id}-families.fa"
+        repeat_db = "results/{run_id}/repeatmodeler/{run_id}_DB-families.fa"
 
     output:
         masked_genome = "results/{run_id}/repeatmasker/"+ASSEMBLY_FILE+".masked",
