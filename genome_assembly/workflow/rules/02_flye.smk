@@ -1,7 +1,7 @@
 rule flye:
     input:
         reads = expand(config["nanopore_reads_directory"]+"/{sample}.fastq", sample=config["Nanopore Samples"]),
-
+"results/{run_id}/filtering/{barcode}_filt.fastq.gz"
     output:
         assembly = "results/{run_id}/flye/assembly.fasta",
 
