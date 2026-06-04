@@ -76,6 +76,23 @@ def filter_sequences_with_asterisk(input_file, output_file):
 
     return output_file
 
+
+def latest_interproscan_version():
+    url = "https://hub.docker.com/v2/repositories/interpro/interproscan/tags?page_size=100"
+
+    tags = requests.get(url).json()["results"]
+
+    versions = [
+        tag["name"]
+        for tag in tags
+        if "-" in tag["name"] and tag["name"][0].isdigit()
+    ]
+
+    return sorted(
+        versions,
+        key=lambda v: [int(x) for part in v.split("-") for x in part.split(".")]
+    )[-1]
+
 # Define a rule to filter sequences that end with an asterisk
 rule filter_sequences_with_asterisk:
     input:
@@ -88,16 +105,16 @@ rule filter_sequences_with_asterisk:
 # Pull the latest InterProScan Singularity container
 rule pull_interpro_sif:
     output:
-        f"resources/interproscan_5.75-106.0.sif"
+        f"resources/interproscan_{latest_interproscan_version()}.sif"
     shell:
-        "apptainer pull --force --dir resources/ docker://interpro/interproscan:5.75-106.0"
+        f"apptainer pull --force --dir resources/ docker://interpro/interproscan:{latest_interproscan_version()}"
 
 # Run InterProScan
 rule interproscan_run:
     input:
         cleaned_aa = "results/{run_id}/functional_annotations/cleaned.aa",
-        interpro_data = "resources/interproscan-5.75-106.0/data",
-        container_file = f"resources/interproscan_5.75-106.0.sif"
+        interpro_data = f"resources/interproscan-{latest_interproscan_version()}/data",
+        container_file = f"resources/interproscan_{latest_interproscan_version()}.sif"
  
     output:
         interpro_gff = "results/{run_id}/functional_annotations/interproscan/{run_id}.gff3",
