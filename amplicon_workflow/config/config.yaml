@@ -8,13 +8,14 @@
 threads: 20 # Maximum is 20
 
 # Run ID for the analysis
-run_id: 20260323_IGB_LWMS_Lena
-
+run_id: 20260708_Jiyeon_ethephon_bac_16S
 ### Basecalling and Demultiplexing ###
 
-# If basecalling and demultiplexing has already been performed, provide the path to the directory containing the basecalled and demultiplexed reads.
-# Directory of basecalled and demultiplexed reads
-pod5_dir: /mnt/d/MinKNOW/experiments/20260323_IGB_LWMS_Lena/no_sample_id/20260323_1134_MN45285_FBE96273_220d1d6e/pod5
+# Directory to raw sequencing data (.pod5)
+pod5_dir: /mnt/d/MinKNOW/experiments/Jiyeon_Ethephon_bac_16S/Jiyeon_Ethephon_bac_16S/20260706_1509_MN45285_FBG30511_611d2e94/pod5_merged
+# If you want to rerun the analysis without re-basecalling, set this to True otherwise set to False. 
+# The workflow will extrapolate the location of the fastq files from the pod5 directory.
+re_run: False
 
 # Kit name for basecalling and demultiplexing
 kit_name: SQK-NBD114-96 # e.g. Native Barcoding Kit 96 V14 = SQK-NBD114-96
@@ -26,7 +27,7 @@ Forward_primer: AGRGTTYGATYMTGGCTCAG
 Reverse_primer: TACGGYTACCTTGTTACGACTT
 
 # Minimum and maximum length of reads to keep
-min_length: 1200
+min_length: 1300
 max_length: 1600
 # Minimum quality score for filtering (10 = 10% error rate, 20 = 1% error rate)
 min_quality: 20

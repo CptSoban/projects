@@ -22,25 +22,45 @@ def get_barcodes():
     Example output:
         ["barcode01", "barcode02", ...]
     """
-    ckpt = checkpoints.demultiplex.get()
+    # If re_run is False, discover barcodes from the demultiplex checkpoint output.
+    if config["re_run"] == False:
+        print("Demultiplex checkpoint found. Discovering barcodes from checkpoint output.")
+        ckpt = checkpoints.demultiplex.get()
 
-    demux_dir = ckpt.output.output_dir
+        demux_dir = ckpt.output.output_dir
 
-    return glob_wildcards(
-        os.path.join(demux_dir, "{barcode}.fastq.gz")
-    ).barcode
+        return glob_wildcards(
+            os.path.join(demux_dir, "{barcode}.fastq.gz")
+        ).barcode
+    
+    # If re_run is True, assume FASTQ files are already available in the specified directory.
+    elif config["re_run"] == True:
+        SAMPLES = glob_wildcards(config["pod5_dir"]+"simplex_basecalled/{barcode}.fastq.gz")
+        return SAMPLES.barcode
 
 
 def demux_filename(wildcards):
     """
     Return full paths to demultiplexed FASTQ files.
     """
-    ckpt = checkpoints.demultiplex.get()
+    # If re_run is False, retrieve demultiplexed FASTQ filenames from the checkpoint output.
+    if config["re_run"] == False:
+        print("Demultiplex checkpoint found. Retrieving demultiplexed FASTQ filenames from checkpoint output.")
+        ckpt = checkpoints.demultiplex.get()
 
-    demux_dir = ckpt.output.output_dir
-    barcodes = get_barcodes()
+        demux_dir = ckpt.output.output_dir
+        barcodes = get_barcodes()
 
-    return os.path.join(demux_dir, f"{wildcards.barcode}.fastq.gz")
+        return os.path.join(demux_dir, f"{wildcards.barcode}.fastq.gz")
+
+    # If re_run is True, assume FASTQ files are already available in the specified directory.
+    elif config["re_run"] == True:
+        print("Demultiplex checkpoint not found. Assuming FASTQ files are already available in the specified directory.")
+        SAMPLES = glob_wildcards(config["pod5_dir"]+"simplex_basecalled/{barcode}.fastq.gz")
+        return expand(
+            os.path.join(config["pod5_dir"]+"simplex_basecalled", "{barcode}.fastq.gz"),
+            barcode=SAMPLES.barcode
+        )
 
 ############################################################
 # FINAL TARGETS
@@ -53,17 +73,6 @@ def get_final_output(wildcards):
     barcodes = get_barcodes()
 
     return (
-            # expand(
-            #     "results/{run_id}/filtering/{barcode}_trim.fastq",
-            #     run_id=RUN_ID,
-            #     barcode=barcodes
-            # )
-            # +
-            #  expand(
-            #     "results/{run_id}/filtering/{barcode}_filt.fastq.gz",
-            #     run_id=RUN_ID,
-            #     barcode=barcodes
-            # )
         expand(
             "results/{run_id}/clustering/{barcode}_centroids.fasta",
             run_id=RUN_ID,
@@ -91,7 +100,11 @@ rule all:
 # INCLUDE WORKFLOW MODULES
 ############################################################
 
-include: "rules/01_simplex_basecalling.smk"
+if config["re_run"] == True:
+    print("Re-run mode enabled. Skipping basecalling and demultiplexing steps.")
+elif config["re_run"] == False:
+    include: "rules/01_simplex_basecalling.smk"
+
 include: "rules/02_general_filtering.smk"
 include: "rules/03_dereplication.smk"
 include: "rules/04_clustering.smk"
