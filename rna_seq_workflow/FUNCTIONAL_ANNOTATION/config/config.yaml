@@ -1,0 +1,72 @@
+#This is the configuration file for the rna_seq_worklow.
+#You have to modify this file to your needs and fill out every option (if not stated otherwise), 
+#but do not add or remove options if your not 100% sure what you are doing!
+
+# Computational resources
+threads: 20
+
+#The ID for this analyis run
+run id: 20260421_APILAI
+
+#Absolute path to the directory containing the results of the DEG analysis (results/{run_id}/DEG_analysis/)
+deg_results: /home/nanopore/projects/rna_seq_workflow/DEG_ANALYSIS/results/20260421_APILAI
+
+# Minimum base mean expression value for a gene to be considered in the analysis
+min_base_mean: 100
+
+#Absolute path to the genome annotation file (GTF) 
+gtf: /home/nanopore/projects/genome_annotation/results/apiotrichum_laibachii/braker/braker.gtf
+
+#Contrast .csv file containing a "treatment" column and a "control" column specifying what conditions should be contrasted. 
+contrast :  /home/nanopore/projects/rna_seq_workflow/DEG_ANALYSIS/resources/20250528_APILAI/APILAI_contrast.csv
+
+#Absoulte path to the reference amino acid sequences
+protein_fasta: /home/nanopore/projects/genome_annotation/results/apiotrichum_laibachii/braker/braker.aa
+
+# InterProScan
+interproscan_version: 5.78-109.0
+GO_terms: "yes"
+
+# FDR threshold for pathway enrichment analysis
+fdr_threshold: 0.1
+
+# List of KEGG pathway names to be ignored in the enrichment analysis
+filter_terms: [
+  "Cancer",
+  "Carcinogenesis",
+  "Longevity",
+  "Phagocytosis",
+  "Coronavirus disease - COVID-19",
+  "Alzheimer disease",
+  "Parkinson disease",
+  "Diabetic cardiomyopathy",
+  "Non-alcoholic fatty liver disease",
+  "Cardiac muscle contraction",
+  "Chemokine signaling pathway",
+  "Toll-like receptor signaling pathway",
+  "Hepatitis",
+  "Estrogen signaling pathway",
+  "Neurotrophin signaling pathway",
+  "Carbon fixation by Calvin cycle",
+  "Thermogenesis",
+  "Chemokine signaling pathway",
+  "T cell receptor signaling pathway",
+  "Phagosome",
+  "Necroptosis",
+  "Axon guidance",
+  "Thyroid hormone signaling pathway",
+  "HIF-1 signaling pathway",
+  "Relaxin signaling pathway",
+  "Estrogen signaling pathway",
+  "Alcoholic liver disease",
+  "animal",
+  "Cytosolic DNA-sensing pathway",
+  "Ribosome",
+  "Human",
+  "Oxytocin",
+  "Insulin",
+  "disease",
+  "pancreatic",
+  "synapse",
+  "rheumatic",
+]

@@ -1,0 +1,6 @@
+channels:
+ - conda-forge
+ - bioconda
+dependencies:
+ - python=3.10.6
+ - subread=2.0.3

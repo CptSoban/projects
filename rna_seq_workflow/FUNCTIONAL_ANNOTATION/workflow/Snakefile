@@ -1,0 +1,79 @@
+from snakemake.utils import min_version
+# Check if the version of snakemake is at least 8.11.3
+min_version("8.11.3")
+from pathlib import Path
+import pandas as pd
+
+# Load the configuration file
+configfile: "config/config.yaml"
+
+# Define the contrast conditions
+def contrast_conditions(config_contrast):
+    if not Path(config_contrast).exists():
+        raise FileNotFoundError(f"Contrast file '{config_contrast}' not found.")
+    contrast_df = pd.read_csv(config_contrast)
+    if contrast_df.empty or contrast_df.shape[1] < 2:
+        raise ValueError("Contrast file is empty or has fewer than two columns.")
+    contrast_list = ["_vs_".join(pair) for pair in contrast_df.values.tolist()]
+    return contrast_list
+
+# Define the variables
+CONTRAST = contrast_conditions(config["contrast"])
+RUN_ID = config["run id"]
+
+# Define the wildcard constraints
+wildcard_constraints:
+    contrast = ".*_vs_.*",
+    run_id = config["run id"]
+
+# Define the final output files
+def get_final_output():
+        # Add functional annotation files to final output
+        final_output = [
+            expand("resources/{run_id}_gtf_db", run_id=RUN_ID),
+            expand("results/{run_id}/trimmed/trim_{contrast}.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/interproscan/{run_id}.gff3", run_id=RUN_ID),
+            expand("resources/{run_id}/interpro_results_db", run_id=RUN_ID),
+            expand("results/{run_id}/interproscan/{contrast}_interpro_annotations.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/eggnog/{run_id}.emapper.annotations", run_id=RUN_ID),
+        ]
+        # Add eggnog annotations to final output
+        final_output.extend([
+            expand("results/{run_id}/functional_annotations/{contrast}_combined_annotations.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/functional_annotations/{contrast}_annotate_id_with_ko.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/functional_annotations/{contrast}_annotate_ko_with_log2fc.csv", run_id=RUN_ID, contrast=CONTRAST),
+        ])
+
+        # Add enrichment analysis files to final output
+        final_output.extend([
+            expand("resources/{run_id}/enrichment_analysis/kegg_request/{run_id}_kegg_cache.json", run_id=RUN_ID),
+            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_results_pathways.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_plot_pathways.png", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_results_modules.csv", run_id=RUN_ID, contrast=CONTRAST),
+            expand("results/{run_id}/enrichment_analysis/gsea/{contrast}_gsea_plot_modules.png", run_id=RUN_ID, contrast=CONTRAST),
+        ])
+    
+        return final_output
+
+# Define the rule to generate the final output
+rule all:
+    input:
+        get_final_output()
+
+
+# Include the rules
+
+include:    "rules/01_gtf_db.smk"
+include:    "rules/02_annotate_deg_with_proteins.smk"
+include:    "rules/03_interproscan.smk"
+include:    "rules/04_interpro_annotations.smk"
+include:    "rules/05_eggnog.smk"
+include:    "rules/06_eggnog_annotations.smk"
+include:    "rules/07_kegg_reconstruct.smk"
+include:    "rules/08_kegg_request.smk"
+include:    "rules/09_gsea.smk"
+
+
+
+
+

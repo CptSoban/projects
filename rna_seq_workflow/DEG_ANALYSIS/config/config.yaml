@@ -1,0 +1,26 @@
+#This is the configuration file for the rna_seq_worklow.
+#You have to modify this file to your needs and fill out every option (if not stated otherwise), 
+#but do not add or remove options if your not 100% sure what you are doing!
+
+# Computational resources
+threads: 20
+
+#Absolute path to your RNAseq reads directory. sample names should have the following format: ID_GROUP.fastq.gz
+seq_dir: /home/nanopore/projects/rna_seq_workflow/resources/20250206_CLORO/reads
+#Strandness of RNA-seq reads ["",0] for Unstranded, ["FR",1] for Stranded or ["RF",2] for Reverse Stranded
+Strandness: ["RF",2]
+
+#Absolute path to the reference genome fasta
+ref_genome: /home/nanopore/projects/genome_annotation/results/clonostachys_rosea/repeatmasker/clonostachys_rosea.fasta.masked
+
+#The ID for this analyis run
+run id: 20260603_CLORO
+
+#Absolute path to the genome annotation file (GTF) 
+gtf: /home/nanopore/projects/genome_annotation/results/clonostachys_rosea/braker/braker.gtf
+
+#Sample info file 
+sample_info: /home/nanopore/projects/rna_seq_workflow/resources/20250206_CLORO/20250206_CLORO_info.csv
+
+#Contrast .csv file containing a "treatment" column and a "control" column specifying what conditions should be contrasted. 
+contrast :  /home/nanopore/projects/rna_seq_workflow/resources/20250206_CLORO/20250206_CLORO_contrast.csv
